@@ -1,0 +1,29 @@
+{
+  "name": "fronted",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --open --hot",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "core-js": "^2.6.5",
+    "vue": "^2.6.6",
+    "vue-router": "^3.0.4",
+    "vuetify": "^1.5.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.5.0",
+    "@vue/cli-service": "^3.5.0",
+    "css-loader": "^2.1.1",
+    "file-loader": "^3.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.23.1",
+    "url-loader": "^1.1.2",
+    "vue-loader": "^15.7.0",
+    "vue-template-compiler": "^2.5.21",
+    "webpack": "^4.30.0",
+    "webpack-dev-server": "^3.3.1"
+  }
+}
