@@ -74,10 +74,10 @@ class QuizBank(models.Model):
         KnowledgePoint,
         verbose_name="知识点",
         through='QuizKnowledgePointShip',
-        through_fields=('quiz', 'knowledgePoint'),
+        through_fields=('quiz', 'knowledgePoint')
     )
     quizText = models.TextField(max_length=1000, verbose_name="试题文本")
-    quizFullScore = models.IntegerField(verbose_name="满分")
+    quizFullScore = models.IntegerField(verbose_name="满分",)
     quizFilename = models.FileField(upload_to="%Y/%m/%d", verbose_name="文件名")
     quizInputer = models.ForeignKey(
         admin.User,

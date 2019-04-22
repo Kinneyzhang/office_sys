@@ -8,5 +8,6 @@ urlpatterns = [
     path('login/', views.login),
     path('show_quiz/', views.show_quiz),
     path('download/', views.download),
-    path('upload/', views.upload)
+    path('upload/', views.upload),
+   #  path('get_bing_image/', views.get_bing_image)
 ]

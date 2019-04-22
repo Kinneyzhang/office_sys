@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 
 from backend.models import User
-from backend.models import QuizBank, QuizType, KnowledgePoint
+from backend.models import QuizBank, QuizType, KnowledgePoint, QuizKnowledgePointShip
 from backend.models import ExerRecord
 
 
@@ -30,11 +30,16 @@ class QuizBankAdmin(admin.ModelAdmin):
         'quizFilename', 'quizCreateTime',
         'quizModifyTime'
     )
-    fields = (
-        'quizInputer', 'quizType',
-        'quizText', 'quizPointNum',
-        'quizFullScore', 'quizFilename'
-    )
+    # fields = (
+    #     'quizId', 'quizInputer', 'quizType',
+    #     'quizText', 'quizPointNum',
+    #     'quizFullScore', 'quizFilename'
+    # )
+    # filter_horizontal = ('quizKnowledgePoint',)
+
+
+class QuizKnowledgePointShipAdmin(admin.ModelAdmin):
+    list_display = ('quiz', 'knowledgePoint')
 
 
 class ExerRecordAdmin(admin.ModelAdmin):
@@ -51,3 +56,4 @@ admin.site.register(QuizBank, QuizBankAdmin)
 admin.site.register(ExerRecord, ExerRecordAdmin)
 admin.site.register(QuizType, QuizTypeAdmin)
 admin.site.register(KnowledgePoint, KnowledgePointAdmin)
+admin.site.register(QuizKnowledgePointShip, QuizKnowledgePointShipAdmin)

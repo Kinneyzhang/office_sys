@@ -6,10 +6,14 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import User, QuizBank
 import json
 
-import os
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import re
 
+import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload/quiz_bank/')
 
 
 @csrf_exempt
@@ -44,8 +48,8 @@ def login(request):
     msg = ""
     username = user_info["username"]
     password = user_info["password"]
-    user_id = 0
-    is_login = False
+    userid = 0
+    islogin = False
 
     request.session.flush()
     # if request.session.get('is_login', True):
@@ -58,16 +62,16 @@ def login(request):
         msg = "该用户未注册！"
     else:
         if password == u.userPasswd:
-            is_login = True
-            user_id = User.objects.get(userName=username).id
+            islogin = True
+            userid = User.objects.get(userName=username).id
             msg = "登陆成功！"
         else:
             msg = "密码输入错误！"
 
     return JsonResponse(
         {
-            "msg": msg, "user_id": user_id,
-            "username": username, "is_login": is_login
+            "msg": msg, "user_id": userid,
+            "user_name": username, "is_login": islogin
         }
     )
 
@@ -75,15 +79,16 @@ def login(request):
 def show_quiz(request):
     quiz = QuizBank.objects.all()
     quiz_list = list(quiz.values('quizFilename', 'quizText'))
-    quiz_list = json.dumps(quiz_list)
-    return JsonResponse(quiz_list, safe=False)
+    quiz_item = json.dumps(quiz_list)
+
+    return JsonResponse(quiz_item, safe=False)
 
 
 def download(request):
     req = json.loads(request.body.decode())
     f = req["filename"]
-    filename = QuizBank.objects.get(filename=f).filename
-    file = open(os.path.join(BASE_DIR, 'upload/%s') % filename, 'rb')
+    filename = QuizBank.objects.get(quizFilename=f).quizFilename
+    file = open(os.path.join(MEDIA_ROOT, '%s') % filename, 'rb')
     response = FileResponse(file)
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="%s.zip"' % filename
@@ -105,3 +110,9 @@ def upload(request):
             f.write(chunk)
         f.close()
         return JsonResponse({'msg': 'OK'})
+
+
+# def get_bing_image(request):
+#     html = urlopen("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&nc=1555602334998&pid=hp")
+
+#     return JsonResponse({"bgUrl": url})
