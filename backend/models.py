@@ -59,7 +59,12 @@ class QuizBank(models.Model):
         ('only', '单一'),
         ('many', '综合')
     )
-    quizId = models.CharField(primary_key=True, max_length=20)
+    QUIZ_DIFFICULTY = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+    )
+    quizId = models.CharField(max_length=20)
     quizType = models.ForeignKey(
         QuizType,
         on_delete=models.CASCADE,
@@ -72,13 +77,16 @@ class QuizBank(models.Model):
     )
     quizKnowledgePoint = models.ManyToManyField(
         KnowledgePoint,
-        verbose_name="知识点",
-        through='QuizKnowledgePointShip',
-        through_fields=('quiz', 'knowledgePoint')
+        verbose_name="知识点"
     )
     quizText = models.TextField(max_length=1000, verbose_name="试题文本")
     quizFullScore = models.IntegerField(verbose_name="满分",)
     quizFilename = models.FileField(upload_to="%Y/%m/%d", verbose_name="文件名")
+    quizDifficulty = models.CharField(
+        max_length=1,
+        choices=QUIZ_DIFFICULTY,
+        verbose_name="难度系数"
+    )
     quizInputer = models.ForeignKey(
         admin.User,
         on_delete=models.CASCADE,
@@ -94,24 +102,6 @@ class QuizBank(models.Model):
         db_table = 'quiz_bank'
         verbose_name = '题库'
         verbose_name_plural = '1. 题库'
-
-
-class QuizKnowledgePointShip(models.Model):
-    quiz = models.ForeignKey(
-        QuizBank,
-        on_delete=models.CASCADE,
-        verbose_name="试题"
-    )
-    knowledgePoint = models.ForeignKey(
-        KnowledgePoint,
-        on_delete=models.CASCADE,
-        verbose_name="知识点"
-    )
-
-    class Meta:
-        db_table = 'quiz_knowledgePoint_ship'
-        verbose_name = '试题知识点映射'
-        verbose_name_plural = '6. 试题知识点映射'
 
 
 class ExerRecord(models.Model):
@@ -139,3 +129,49 @@ class ExerRecord(models.Model):
         db_table = 'exer_record'
         verbose_name = '练习记录'
         verbose_name_plural = '2. 练习记录'
+
+
+class Post(models.Model):
+    POST_TOPIC = (
+        ('word', 'word'),
+        ('excel', 'excel'),
+        ('ppt', 'ppt'),
+        ('meta', 'meta'),
+        ('exam', '等级考试'),
+        ('work', '办公技巧')
+    )
+    postTopic = models.CharField(max_length=10, choices=POST_TOPIC, verbose_name="帖子主题")
+    postTitle = models.CharField(max_length=30, verbose_name="帖子标题")
+    postContent = models.TextField(max_length=1000, verbose_name="帖子内容")
+    postPerson = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="发贴人"
+    )
+    postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
+    postModifyTime = models.DateTimeField(auto_now=True, verbose_name="修改时间")
+
+    class Meta:
+        db_table = 'forum_post'
+        verbose_name = '讨论s帖子'
+        verbose_name_plural = '6. 讨论帖子'
+
+
+class PostReply(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        verbose_name="帖子主题"
+    )
+    replyPerson = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="回复人"
+    )
+    replyContent = models.TextField(max_length=1000, verbose_name="回复内容")
+    replyTime = models.DateTimeField(auto_now_add=True, verbose_name="回复时间")
+
+    class Meta:
+        db_table = 'post_reply'
+        verbose_name = '帖子回复'
+        verbose_name_plural = '7. 帖子回复'

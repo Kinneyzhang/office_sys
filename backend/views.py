@@ -78,7 +78,7 @@ def login(request):
 
 def show_quiz(request):
     quiz = QuizBank.objects.all()
-    quiz_list = list(quiz.values('quizFilename', 'quizText'))
+    quiz_list = list(quiz.values('quizId', 'quizText'))
     quiz_item = json.dumps(quiz_list)
 
     return JsonResponse(quiz_item, safe=False)
@@ -86,8 +86,8 @@ def show_quiz(request):
 
 def download(request):
     req = json.loads(request.body.decode())
-    f = req["filename"]
-    filename = QuizBank.objects.get(quizFilename=f).quizFilename
+    quizId = req["quiz_id"]
+    filename = QuizBank.objects.get(quizId=quizId).quizFilename
     file = open(os.path.join(MEDIA_ROOT, '%s') % filename, 'rb')
     response = FileResponse(file)
     response['Content-Type'] = 'application/octet-stream'
