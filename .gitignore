@@ -3,3 +3,5 @@ os_env
 *node_modules
 *#*#*
 *.DS_Store
+upload
+*migrations
