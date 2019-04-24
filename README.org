@@ -1,0 +1,5 @@
+* install
+
+  #+BEGIN_SRC sh
+    pip install -r requirement.txt
+  #+END_SRC
