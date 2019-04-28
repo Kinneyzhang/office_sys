@@ -2,11 +2,11 @@
   <v-app
     id="inspire"
   >
-    <app-sidebar></app-sidebar>
+    <!-- <app-sidebar></app-sidebar> -->
     <app-toolbar></app-toolbar>
     <v-content>
       <v-container fill-height>
-        <v-layout justify-center>
+        <v-layout fluid>
           <router-view/>
         </v-layout>
       </v-container>

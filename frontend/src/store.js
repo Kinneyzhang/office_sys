@@ -19,7 +19,12 @@ const store = new Vuex.Store({
 	drawer(state, payload) {
 	    state.drawer = payload.drawer
 	}
-     }
+    },
+    getters: {
+	drawer: (state) => {
+	    return state.drawer
+	},
+    }
 })
 
 export default store

@@ -6,7 +6,7 @@ from django.contrib import admin
 from backend.models import User
 from backend.models import QuizBank, QuizType, KnowledgePoint
 from backend.models import ExerRecord
-from backend.models import Post, PostReply
+from backend.models import Post, PostReply, PostTag
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -51,15 +51,19 @@ class ExerRecordAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = (
-        'postTopic', 'postTitle',
+        'postTag', 'postTitle',
         'postPerson', 'postCreateTime', 'postModifyTime'
     )
 
 
 class PostReplyAdmin(admin.ModelAdmin):
     list_display = (
-        'post', 'replyPerson', 'replyContent', 'replyTime'
+        'replyPerson', 'replyContent', 'replyTime'
     )
+
+
+class PostTagAdmin(admin.ModelAdmin):
+    list_display = ('postTag', 'tagCreateTime', 'tagModifyTime')
 
 
 admin.site.register(User, UserAdmin)
@@ -69,4 +73,4 @@ admin.site.register(QuizType, QuizTypeAdmin)
 admin.site.register(KnowledgePoint, KnowledgePointAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(PostReply, PostReplyAdmin)
-# admin.site.register(QuizKnowledgePointShip, QuizKnowledgePointShipAdmin)
+admin.site.register(PostTag, PostTagAdmin)

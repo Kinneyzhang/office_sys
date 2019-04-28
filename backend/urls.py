@@ -9,5 +9,7 @@ urlpatterns = [
     path('show_quiz/', views.show_quiz),
     path('download/', views.download),
     path('upload/', views.upload),
-   #  path('get_bing_image/', views.get_bing_image)
+    path('create_post/', views.create_post),
+    path('get_post/', views.get_post),
+    path('get_tagNum/', views.get_tagNum),
 ]

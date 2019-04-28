@@ -62,8 +62,13 @@
      ]
    }),
    computed: {
-     drawer(){
-       return this.$store.state.drawer
+     drawer: {
+       get () {
+         return this.$store.state.drawer
+       },
+       set (value) {
+         this.$store.commit('drawer', value)
+       }
      }
    }
  }

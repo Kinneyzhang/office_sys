@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 from django.http import JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 # from django.core import serializers
-from .models import User, QuizBank
+from .models import User, QuizBank, Post, PostTag
 import json
 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import re
+from django.db.models import Count
 
 import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -79,9 +80,8 @@ def login(request):
 def show_quiz(request):
     quiz = QuizBank.objects.all()
     quiz_list = list(quiz.values('quizId', 'quizText'))
-    quiz_item = json.dumps(quiz_list)
 
-    return JsonResponse(quiz_item, safe=False)
+    return JsonResponse(json.dumps(quiz_list), safe=False)
 
 
 def download(request):
@@ -112,7 +112,46 @@ def upload(request):
         return JsonResponse({'msg': 'OK'})
 
 
-# def get_bing_image(request):
-#     html = urlopen("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&nc=1555602334998&pid=hp")
+def create_post(request):
+    req = json.loads(request.body.decode())
+    postUser = req["postUser"]
+    postTitle = req["postTitle"]
+    postTag = req["postTag"]
+    postContent = req["postContent"]
+    postTag = PostTag.objects.get(postTag=postTag)
+    postUser = User.objects.get(userName=postUser)
+    post = Post(
+        postTag=postTag, postTitle=postTitle,
+        postContent=postContent, postPerson=postUser
+    )
+    post.save()
+    return JsonResponse({"msg": "post create successfully!"})
 
-#     return JsonResponse({"bgUrl": url})
+
+def get_post(request):
+    post = Post.objects.all()
+    # 获取帖子回复的数量
+    
+    # 计算帖子了多长时间
+    post_list = list(post.values(
+        'postPerson', 'postTitle',
+        'postTag', 'postContent',
+    ))
+    return JsonResponse(json.dumps(post_list), safe=False)
+
+
+def get_tagNum(request):
+    # 获取每类标签的帖子的数量
+    TagNumList = []
+    num = 0
+    TagSet = PostTag.objects.all()
+    for t in TagSet:  # 直接遍历QuerySet
+        if t is None:
+            num = 0  # 没有帖子的标签查询不到
+        else:
+            # Post模型中的postTag是外键,不是数据字符串
+            num = len(Post.objects.filter(postTag=t))
+            print(num)
+        TagNumList.append({"tagName": str(t), "tagNum": num})
+
+    return JsonResponse(json.dumps(TagNumList), safe=False)

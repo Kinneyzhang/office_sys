@@ -14,6 +14,9 @@ class User(models.Model):
         verbose_name = '用户信息'
         verbose_name_plural = '3. 用户信息'
 
+    def __str__(self):
+        return self.userName
+
 
 class QuizType(models.Model):
     quizTypeId = models.CharField(
@@ -131,42 +134,32 @@ class ExerRecord(models.Model):
         verbose_name_plural = '2. 练习记录'
 
 
-class Post(models.Model):
-    POST_TOPIC = (
-        ('word', 'word'),
-        ('excel', 'excel'),
-        ('ppt', 'ppt'),
-        ('meta', 'meta'),
-        ('exam', '等级考试'),
-        ('work', '办公技巧')
-    )
-    postTopic = models.CharField(max_length=10, choices=POST_TOPIC, verbose_name="帖子主题")
-    postTitle = models.CharField(max_length=30, verbose_name="帖子标题")
-    postContent = models.TextField(max_length=1000, verbose_name="帖子内容")
-    postPerson = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name="发贴人"
-    )
-    postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
-    postModifyTime = models.DateTimeField(auto_now=True, verbose_name="修改时间")
+class PostTag(models.Model):
+    postTag = models.CharField(max_length=10, verbose_name="帖子标签名")
+    tagCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="标签创建时间")
+    tagModifyTime = models.DateTimeField(auto_now=True, verbose_name="标签修改时间")
 
     class Meta:
-        db_table = 'forum_post'
-        verbose_name = '讨论s帖子'
-        verbose_name_plural = '6. 讨论帖子'
+        db_table = 'post_tag'
+        verbose_name = '帖子标签'
+        verbose_name_plural = '8. 帖子标签'
+
+    def __str__(self):
+        return self.postTag
 
 
 class PostReply(models.Model):
-    post = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE,
-        verbose_name="帖子主题"
-    )
     replyPerson = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="回复人"
+        verbose_name="回复人",
+        related_name='replyPerson'
+    )
+    replyTo = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="回复对象",
+        related_name='replyTo'
     )
     replyContent = models.TextField(max_length=1000, verbose_name="回复内容")
     replyTime = models.DateTimeField(auto_now_add=True, verbose_name="回复时间")
@@ -175,3 +168,26 @@ class PostReply(models.Model):
         db_table = 'post_reply'
         verbose_name = '帖子回复'
         verbose_name_plural = '7. 帖子回复'
+
+
+class Post(models.Model):
+    postTag = models.ForeignKey(
+        PostTag,
+        on_delete=models.CASCADE,
+        verbose_name="帖子主题"
+    )
+    postTitle = models.CharField(max_length=30, verbose_name="帖子标题")
+    postContent = models.TextField(max_length=1000, verbose_name="帖子内容")
+    postPerson = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="发贴人"
+    )
+    postReply = models.ManyToManyField(PostReply, verbose_name="回复帖子")
+    postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
+    postModifyTime = models.DateTimeField(auto_now=True, verbose_name="修改时间")
+
+    class Meta:
+        db_table = 'forum_post'
+        verbose_name = '讨论帖子'
+        verbose_name_plural = '6. 讨论帖子'

@@ -6,7 +6,7 @@
       v-model="selected"
       :headers="headers"
       :items="quizlist"
-      class="elevation-1"
+      class="elevation-0"
       select-all
       item-key="quiz_id"
       :pagination.sync="pagination"
