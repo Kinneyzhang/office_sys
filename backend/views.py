@@ -198,12 +198,15 @@ def get_reply(request):
     postObj = {
         'poster': post.postPerson.userName,
         'post_title': post.postTitle,
+        'post_content': post.postContent,
         'post_tag': post.postTag.postTag,
         'post_create_time': post.postCreateTime,
         'post_modify_time': post.postModifyTime,
         'reply_num': len(post.postReply.all()),
         'view_num': post.postViewNum,
     }
+    reply_list.append(postObj)
+
     try:
         reply = post.postReply.all()
     except reply.DoesNotExist:
@@ -219,7 +222,7 @@ def get_reply(request):
                 "msg": msg
             })
 
-    return JsonResponse(json.dumps(reply_list, postObj, cls=ComplexEncoder), safe=False)
+    return JsonResponse(json.dumps(reply_list, cls=ComplexEncoder), safe=False)
 
 
 def create_reply_reply(request):
