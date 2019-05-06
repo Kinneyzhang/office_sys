@@ -1,5 +1,5 @@
 <template>
-  <v-flex xs12 sm12 fill-height>
+  <div>
     <v-data-table
       expand
       hide-actions
@@ -36,7 +36,7 @@
     <div class="text-xs-center pt-2">
       <v-pagination v-model="pagination.page" :length="pages"></v-pagination>
     </div>
-  </v-flex>
+  </div>
 </template>
 
 <script>

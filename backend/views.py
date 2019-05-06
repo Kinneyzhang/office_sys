@@ -3,18 +3,24 @@ from __future__ import unicode_literals
 from django.http import JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 # from django.core import serializers
-from .models import User, QuizBank, Post, PostTag
+from .models import User, QuizBank, Post, PostTag, PostReply
 import json
-
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
-import re
-from django.db.models import Count
-
+import datetime
 import os
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_ROOT = os.path.join(BASE_DIR, 'upload/quiz_bank/')
+
+
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(obj, datetime.date):
+            return obj.strftime('%Y-%m-%d')
+        else:
+            return json.JSONEncoder.default(self, obj)
 
 
 @csrf_exempt
@@ -108,7 +114,7 @@ def upload(request):
         f = open(os.path.join(BASE_DIR, 'upload', 'userup', fileObj.name),'wb')
         for chunk in fileObj.chunks():
             f.write(chunk)
-        f.close()
+            f.close()
         return JsonResponse({'msg': 'OK'})
 
 
@@ -128,18 +134,6 @@ def create_post(request):
     return JsonResponse({"msg": "post create successfully!"})
 
 
-def get_post(request):
-    post = Post.objects.all()
-    # 获取帖子回复的数量
-    
-    # 计算帖子了多长时间
-    post_list = list(post.values(
-        'postPerson', 'postTitle',
-        'postTag', 'postContent',
-    ))
-    return JsonResponse(json.dumps(post_list), safe=False)
-
-
 def get_tagNum(request):
     # 获取每类标签的帖子的数量
     TagNumList = []
@@ -151,7 +145,94 @@ def get_tagNum(request):
         else:
             # Post模型中的postTag是外键,不是数据字符串
             num = len(Post.objects.filter(postTag=t))
-            print(num)
+            # print(num)
         TagNumList.append({"tagName": str(t), "tagNum": num})
 
     return JsonResponse(json.dumps(TagNumList), safe=False)
+
+
+def get_post_list(request):
+    # 获取帖子回复的数量
+    # 计算帖子发了多长时间
+    # 根据Post表中的postPerson实例到User表中查找对应的userName
+    post_list = []
+    post = Post.objects.all()
+    for p in post:
+        post_list.append({
+            'post_id': p.id,
+            'poster': p.postPerson.userName,
+            'post_title': p.postTitle,
+            'post_tag': p.postTag.postTag,
+            'post_create_time': p.postCreateTime,
+            'post_modify_time': p.postModifyTime,
+            'reply_num': len(p.postReply.all()),
+            'view_num': p.postViewNum
+        })
+
+    return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)
+
+
+def create_post_reply(request):
+    req = json.loads(request.body.decode())
+    reply_from = req["reply_from"]
+    reply_to = req["reply_to"]
+    reply_content = req["reply_content"]
+    reply_post = req["reply_post"]
+    post_reply = PostReply.objects.create(
+        replyFrom=User.objects.get(pk=reply_from),
+        replyTo=User.objects.get(userName=reply_to),
+        replyContent=reply_content
+    )
+    Post.objects.get(pk=reply_post).postReply.add(post_reply)
+
+    return JsonResponse({"msg": "回复成功！"})
+
+
+def get_reply(request):
+    reply_list = []
+    req = json.loads(request.body.decode())
+    post_id = req["post_id"]  # 不能和模型字段名一样，会报错
+    msg = ""
+
+    post = Post.objects.get(pk=post_id)
+    postObj = {
+        'poster': post.postPerson.userName,
+        'post_title': post.postTitle,
+        'post_tag': post.postTag.postTag,
+        'post_create_time': post.postCreateTime,
+        'post_modify_time': post.postModifyTime,
+        'reply_num': len(post.postReply.all()),
+        'view_num': post.postViewNum,
+    }
+    try:
+        reply = post.postReply.all()
+    except reply.DoesNotExist:
+        msg = "该帖子尚无回复！"
+    else:
+        msg = "有回复"
+        for r in reply:
+            reply_list.append({
+                "reply_from": r.replyFrom.userName,
+                "reply_to": r.replyTo.userName,
+                "reply_content": r.replyContent,
+                "reply_time": r.replyTime,
+                "msg": msg
+            })
+
+    return JsonResponse(json.dumps(reply_list, postObj, cls=ComplexEncoder), safe=False)
+
+
+def create_reply_reply(request):
+    req = json.loads(request.body.decode())
+    reply_from = req["reply_from"]
+    reply_to = req["reply_to"]
+    reply_content = req["reply_content"]
+    reply_post = req["reply_post"]
+    post_reply = PostReply.objects.create(
+        replyFrom=User.objects.get(pk=reply_from),
+        replyTo=User.objects.get(userName=reply_to),
+        replyContent=reply_content
+    )
+    Post.objects.get(pk=reply_post).postReply.add(post_reply)
+
+    return JsonResponse({"msg": "回复成功！"})

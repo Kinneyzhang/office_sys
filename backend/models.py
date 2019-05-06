@@ -149,11 +149,11 @@ class PostTag(models.Model):
 
 
 class PostReply(models.Model):
-    replyPerson = models.ForeignKey(
+    replyFrom = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name="回复人",
-        related_name='replyPerson'
+        related_name='replyFrom'
     )
     replyTo = models.ForeignKey(
         User,
@@ -176,16 +176,21 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         verbose_name="帖子主题"
     )
-    postTitle = models.CharField(max_length=30, verbose_name="帖子标题")
+    postTitle = models.CharField(max_length=100, verbose_name="帖子标题")
     postContent = models.TextField(max_length=1000, verbose_name="帖子内容")
     postPerson = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name="发贴人"
     )
-    postReply = models.ManyToManyField(PostReply, verbose_name="回复帖子")
+    postReply = models.ManyToManyField(
+        PostReply,
+        verbose_name="回复帖子",
+        related_name="reply"
+    )
     postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
     postModifyTime = models.DateTimeField(auto_now=True, verbose_name="修改时间")
+    postViewNum = models.IntegerField(default=0, verbose_name="浏览量")
 
     class Meta:
         db_table = 'forum_post'

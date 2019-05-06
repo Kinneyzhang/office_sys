@@ -58,7 +58,7 @@ class PostAdmin(admin.ModelAdmin):
 
 class PostReplyAdmin(admin.ModelAdmin):
     list_display = (
-        'replyPerson', 'replyContent', 'replyTime'
+        'replyFrom', 'replyContent', 'replyTime'
     )
 
 

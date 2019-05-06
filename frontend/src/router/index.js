@@ -4,6 +4,8 @@ import TheHome from '@/components/TheHome'
 import TheQuiz from '@/components/TheQuiz'
 import TheDiscuss from '@/components/TheDiscuss'
 import TheLearn from '@/components/TheLearn'
+import TheBlank from '@/components/TheBlank'
+import DiscussPost from '@/components/DiscussPost'
 
 Vue.use(Router)
 
@@ -22,12 +24,22 @@ export default new Router({
 	{
 	    path: '/discuss',
 	    name: 'TheDiscuss',
-	    component: TheDiscuss
+	    component: TheDiscuss,
+	},
+	{
+	    path: '/post/:id',
+	    name: 'discussPost',
+	    component: DiscussPost
 	},
 	{
 	    path: '/learn',
 	    name: 'TheLearn',
 	    component: TheLearn
+	},
+	{
+	    path: '/blank',
+	    name: 'TheBlank',
+	    component: TheBlank
 	},
     ]
 })
