@@ -3,7 +3,7 @@
     <v-card class="elevation-1">
       <v-card-title>
         <span class="display-1 font-weight-bold">{{userName}}</span>
-        <input type="file" id="upload" ref="upload" multiple accept=".zip, .rar">
+        <input type="file" id="upload" ref="file" multiple accept=".zip, .rar" @change="getFile($event)">
       </v-card-title>
       <v-card-text>
         <span class="subheading grey--text">本站第 1 位用户，注册时间：2019-05-07</span>
@@ -35,10 +35,15 @@
                     <p class="mt-2 overflow2">{{item.quiz_text}}</p>
                   </div>
                 </v-flex>
-                <v-flex md2 sm2 align-center>
-                  <v-btn small color="info" flat v-if="!item.upload_status" @click="popWindow">
-                    <v-icon color="info">publish</v-icon>提交答案
-                  </v-btn>
+                <v-flex md2 sm2 align-center justify-center>
+                  <div v-if="!item.upload_status">
+                    <form>
+                      <v-btn small flat class="grey--text" @click="popWindow"><u>选择文件</u></v-btn>
+                      <v-btn small color="info" flat @click="submitForm($event)">
+                        <v-icon color="info">publish</v-icon>上传
+                      </v-btn>
+                    </form>
+                  </div>
                   <span v-else>答案已提交</span>
                 </v-flex>
               </v-layout>
@@ -48,18 +53,14 @@
           <div v-if="index == 1">
             <div v-for="(item, index) in exer_list" class="downloadBox">
               <v-layout row justify-center align-center>
-                <v-flex md10 sm10>
+                <v-flex md8 sm8>
                   <div class="pl-5 pt-3">
                     <span class="font-weight-medium">{{item.quiz_id}}</span>
-                    <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.upload_time}}&nbsp;下载</span>
-                    <p class="mt-2 overflow2">{{item.quiz_text}}</p>
+                    <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.upload_time}}&nbsp;提交答案</span>
+                    <p class="mt-2 overflow2"></p>
                   </div>
                 </v-flex>
-                <v-flex md2 sm2 align-center>
-                  <v-btn small color="info" flat v-if="!item.upload_status" @click="popWindow">
-                    <v-icon color="info">publish</v-icon>提交答案
-                  </v-btn>
-                  <span v-else>答案已提交</span>
+                <v-flex md4 sm4 align-center>
                 </v-flex>
               </v-layout>
             </div>
@@ -85,6 +86,7 @@
        ],
        download_list: [],
        exer_list: [],
+       file: "",
      }
    },
    computed: {
@@ -125,27 +127,36 @@
              upload_time: uploadTime[i],
              quiz_score: quizScore[i],
              result_info: resultInfo[i],
+             correct_status: correctStatus[i],
            })
          }
        }).catch(err => {
          console.log(err.data)
        }) 
      },
+     getFile(event) {
+       this.file = event.target.files[0];
+       console.log(this.file);
+     },
      popWindow(){
-       let uploadBtn = this.$refs.upload
+       let uploadBtn = this.$refs.file
        uploadBtn.click()
      },
-     upload(){
+     submitForm(event){
+       event.preventDefault();
        this.userid = sessionStorage.getItem("userid")
        let formData = new FormData();
-       formData.append('file', this.$refs.file.files[0])
-       formData.append('')
-       this.$axios.post('/api/upload/', formData, config).then(res => {
+       formData.append('file', this.file)
+       formData.append('userid', this.userid)
+       let config = {
+         headers: {'Content-Type': 'multipart/form-data'}
+       }
+       this.$axios.post('api/upload/', formData, config).then(res => {
          console.log(res)
        }).catch(err => {
          console.log(err)
        })
-     }
+     },
    },
    created(){
      this.get_record()

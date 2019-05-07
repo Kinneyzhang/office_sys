@@ -133,8 +133,9 @@ def get_record(request):
 def upload(request):
     if request.method == 'POST':
         fileObj = request.FILES.get('file')
-        # print(json.dumps(fileObj))
-        # userid = request.FILES.get('userid')
+        print(fileObj)
+        # req = json.loads(request.body.decode())
+        # print(req["userid"])
         f = open(
             os.path.join(BASE_DIR, 'upload', 'user_upload', fileObj.name), 'wb'
         )
