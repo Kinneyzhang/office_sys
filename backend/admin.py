@@ -42,11 +42,11 @@ class QuizBankAdmin(admin.ModelAdmin):
 
 class ExerRecordAdmin(admin.ModelAdmin):
     list_display = (
-        'user', 'quiz',
-        'resultInfo', 'quizScore',
-        'uploadFilename'
+        'user', 'quiz', 'downloadTime',
+        'uploadStatus', 'uploadFilename', 'uploadTime',
+        'correctStatus', 'correctTime', 'correctFlag',
+        'quizScore', 'resultInfo',
     )
-    fields = ('user', 'quiz', 'resultInfo', 'quizScore', 'uploadFilename')
 
 
 class PostAdmin(admin.ModelAdmin):

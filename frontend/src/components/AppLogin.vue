@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="hidden-sm-and-down" v-show="islogin">
-      {{login_usrname}}
-      <v-btn flat @click="logout" outline small>退出登陆</v-btn>
+      <router-link :to="userinfo" tag="span" class="pointer">{{login_usrname}}</router-link>
+      <router-link to="/"><v-btn flat @click="logout" outline small>退出登陆</v-btn></router-link>
     </div>
     
     <div class="hidden-sm-and-down" v-show="!islogin">
@@ -208,6 +208,9 @@
      },
      login_usrid(){
        return this.$store.state.userid
+     },
+     userinfo(){
+       return "/user/" + this.login_usrname
      }
    },
  }

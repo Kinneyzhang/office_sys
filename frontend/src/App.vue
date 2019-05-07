@@ -50,3 +50,21 @@
    },
  }
 </script>
+
+<style>
+ .pointer{
+   cursor: pointer;
+ }
+ .overflow2{
+   overflow: hidden;
+   -webkit-line-clamp: 2;
+   text-overflow: ellipsis;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+ }
+ .overflow1{
+   white-space: nowrap;
+   text-overflow:ellipsis;
+   overflow:hidden;
+ }
+</style>

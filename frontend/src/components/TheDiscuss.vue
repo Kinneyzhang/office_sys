@@ -78,17 +78,12 @@
             label="主题"
             min-width="70%">
             <template slot-scope="scope">
-              <!-- <span
-                   @click="expandPost(scope.row.id)"
-                   class="pointer subheading font-weight-medium"
-                   v-html="scope.row.title"
-                   ></span> -->
               <router-link
+                tag="span"
                 :to="link(scope.row.id)"
                 class="pointer subheading font-weight-medium"
                 v-html="scope.row.title"
-              >
-              </router-link>
+              ></router-link>
               <br>
               <router-link
                 to = "/discuss"
@@ -198,26 +193,23 @@
      closeBox(){
        this.isShow = false;
      },
-     get_tagNum(){
-       this.$axios.get("api/get_tagNum/").then(res => {
-         res = JSON.parse(res.data)
-         this.tagList = res
-       }).catch(err => {
-         console.log(err.data)
-       })
-     },
      get_post_list(){
        this.$axios.get("api/get_post_list/").then(res => {
-         /* console.log(res.data) */
+         console.log(res.data)
          res = JSON.parse(res.data)
-         var postId = res.map(v => v.post_id)
-         var postPerson = res.map(v => v.poster)
-         var postTitle = res.map(v => v.post_title)
-         var postTag = res.map(v => v.post_tag)
-         var postContent = res.map(v => v.post_content)
-         var replyNum = res.map(v => v.reply_num)
-         var viewNum = res.map(v => v.view_num)
-         var modifyTime = res.map(v => v.post_modify_time)
+         
+         var tagArray = res.tag_list
+         this.tagList = tagArray
+         
+         var postArray = res.post_list
+         var postId = postArray.map(v => v.post_id)
+         var postPerson = postArray.map(v => v.poster)
+         var postTitle = postArray.map(v => v.post_title)
+         var postTag = postArray.map(v => v.post_tag)
+         var postContent = postArray.map(v => v.post_content)
+         var replyNum = postArray.map(v => v.reply_num)
+         var viewNum = postArray.map(v => v.view_num)
+         var modifyTime = postArray.map(v => v.post_modify_time)
          var activeTime = []
          for(var i=0; i<postPerson.length; i++){
            activeTime.push(this.timeFormat(modifyTime[i]))
@@ -237,17 +229,12 @@
          console.log(err.data)
        })
      },
-     expandPost(thisId){
-       this.reload()
-       this.$router.push({ name: 'discussPost', params: {'id': thisId}})
-     },
+     /* expandPost(thisId){
+      *   this.reload()
+      *   this.$router.push({ name: 'discussPost', params: {'id': thisId}})
+      * }, */
    },
-   /* mounted(){
-    *   CKEDITOR.replace("editor", {height: "300px", width: "100%", toolbar: "Full"});
-    *   var editor = CKEDITOR.instances.editor2;
-    * }, */
    created(){
-     this.get_tagNum()
      this.get_post_list()
    },
  }
@@ -262,8 +249,5 @@
    position: absolute;
    right: 10px;
    top: 8px;
- }
- .pointer{
-   cursor: pointer;
  }
 </style>

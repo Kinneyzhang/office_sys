@@ -67,7 +67,7 @@
             <v-bottom-sheet v-model="item.reply_sheet" inset>
               <template v-slot:activator>
                 <v-btn flat small class="grey--text" @click="reply_reply(item.reply_from)">
-                  <v-icon>{{item.reply_icon}}</v-icon>回复
+                  <v-icon small>{{item.reply_icon}}</v-icon>回复
                 </v-btn>
               </template>
               <v-list class="pa-2">

@@ -5,7 +5,7 @@
         <h3 class="subheading font-weight-bold mt-0">Office 操作题练习与测试</h3>
         <span class="grey--text">用户未登陆</span>
       </div>
-      <span v-else class="font-weight-medium subheading">欢迎，{{userName}}!</span>
+      <router-link v-else :to="userinfo" class="font-weight-medium subheading pointer">欢迎，{{userName}}!</router-link>
     </v-card-title>
   </v-card>
 </template>
@@ -24,6 +24,11 @@
      userName(){
        return this.$store.state.username
      },
+     userinfo(){
+       return "/user/" + this.userName
+     }
+   },
+   methods: {
    },
  }
 </script>

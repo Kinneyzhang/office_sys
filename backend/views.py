@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.http import JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 # from django.core import serializers
-from .models import User, QuizBank, Post, PostTag, PostReply
+from .models import User, QuizBank, Post, PostTag, PostReply, ExerRecord
 import json
 import datetime
 import os
@@ -93,17 +93,41 @@ def show_quiz(request):
 def download(request):
     req = json.loads(request.body.decode())
     quizId = req["quiz_id"]
+    userId = req["user_id"]
+
     filename = QuizBank.objects.get(quizId=quizId).quizFilename
     file = open(os.path.join(MEDIA_ROOT, '%s') % filename, 'rb')
     response = FileResponse(file)
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="%s.zip"' % filename
+
+    ExerRecord.objects.create(
+        user=User.objects.get(pk=userId),
+        quiz=QuizBank.objects.get(quizId=quizId),
+    )
+
     return response
 
 
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return os.path.join("userup", instance.stu.id, filename)
+def get_record(request):
+    req = json.loads(request.body.decode())
+    userName = req["username"]
+    recordList = []
+    recordSet = ExerRecord.objects.filter(user=User.objects.get(userName=userName))
+    for r in recordSet:
+        recordList.append({
+            'quiz_id': r.quiz.quizId,
+            'quiz_text': r.quiz.quizText,
+            'quiz_type': r.quiz.quizType.quizTypeName,
+            'download_time': r.downloadTime,
+            'upload_status': r.uploadStatus,
+            'quiz_score': r.quizScore,
+            'result_info': r.resultInfo,
+            'upload_time': r.uploadTime,
+            'correct_status': r.correctStatus,
+        })
+
+    return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
 
 
 def upload(request):
@@ -111,7 +135,9 @@ def upload(request):
         fileObj = request.FILES.get('file')
         # print(json.dumps(fileObj))
         # userid = request.FILES.get('userid')
-        f = open(os.path.join(BASE_DIR, 'upload', 'userup', fileObj.name),'wb')
+        f = open(
+            os.path.join(BASE_DIR, 'upload', 'user_upload', fileObj.name), 'wb'
+        )
         for chunk in fileObj.chunks():
             f.write(chunk)
             f.close()
@@ -134,9 +160,26 @@ def create_post(request):
     return JsonResponse({"msg": "post create successfully!"})
 
 
-def get_tagNum(request):
+# def get_tagNum(request):
+#     # 获取每类标签的帖子的数量
+#     TagNumList = []
+#     num = 0
+#     TagSet = PostTag.objects.all()
+#     for t in TagSet:  # 直接遍历QuerySet
+#         if t is None:
+#             num = 0  # 没有帖子的标签查询不到
+#         else:
+#             # Post模型中的postTag是外键,不是数据字符串
+#             num = len(Post.objects.filter(postTag=t))
+#             # print(num)
+#         TagNumList.append({"tagName": str(t), "tagNum": num})
+
+#     return JsonResponse(json.dumps(TagNumList), safe=False)
+
+
+def get_post_list(request):
     # 获取每类标签的帖子的数量
-    TagNumList = []
+    tag_list = []
     num = 0
     TagSet = PostTag.objects.all()
     for t in TagSet:  # 直接遍历QuerySet
@@ -146,15 +189,9 @@ def get_tagNum(request):
             # Post模型中的postTag是外键,不是数据字符串
             num = len(Post.objects.filter(postTag=t))
             # print(num)
-        TagNumList.append({"tagName": str(t), "tagNum": num})
+        tag_list.append({"tagName": str(t), "tagNum": num})
 
-    return JsonResponse(json.dumps(TagNumList), safe=False)
-
-
-def get_post_list(request):
-    # 获取帖子回复的数量
-    # 计算帖子发了多长时间
-    # 根据Post表中的postPerson实例到User表中查找对应的userName
+    # 获取post列表的相关信息
     post_list = []
     post = Post.objects.all()
     for p in post:
@@ -169,7 +206,12 @@ def get_post_list(request):
             'view_num': p.postViewNum
         })
 
-    return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)
+    mix_list = {
+        'tag_list': tag_list,
+        'post_list': post_list,
+    }
+
+    return JsonResponse(json.dumps(mix_list, cls=ComplexEncoder), safe=False)
 
 
 def create_post_reply(request):

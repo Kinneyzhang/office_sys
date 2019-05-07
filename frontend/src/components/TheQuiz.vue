@@ -1,42 +1,50 @@
 <template>
-  <div>
-    <v-data-table
-      expand
-      hide-actions
-      v-model="selected"
-      :headers="headers"
-      :items="quizlist"
-      class="elevation-0"
-      select-all
-      item-key="quiz_id"
-      :pagination.sync="pagination"
+  <v-card class="elevation-1">
+    <el-table
+      :data="quizlist"
+      style="width:100%"
     >
-      <template v-slot:items="props">
-        <td><v-checkbox
-              v-model="props.selected"
-              primary
-              hide-details
-            ></v-checkbox></td>
-        <td>{{ props.item.quiz_id }}</td>
-        <td class="text-xs-left">
-          {{ props.item.quiz_show }}
-          <el-popover
-            placement="bottom-left"
-            width="400"
-            trigger="click"
-            :content= "props.item.quiz_text">
-            <el-button size="mini" type="text" round plain slot="reference">预览</el-button>
-          </el-popover>
-        </td>
-        <td class="text-xs-right">{{ props.item.exer_num }}</td>
-        <td class="text-xs-right">{{ props.item.accuracy }}</td>
-        <td @click="download(props.item.quiz_id)"><v-icon>{{props.item.icon}}</v-icon></td>
-      </template>
-    </v-data-table>
-    <div class="text-xs-center pt-2">
-      <v-pagination v-model="pagination.page" :length="pages"></v-pagination>
-    </div>
-  </div>
+      <el-table-column
+        label="编号"
+        prop="quiz_id"
+        min-width="8%"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        label="试题"
+        min-width="68%"
+        align="center"
+      >
+        <template slot-scope="scope">
+          <div class="font-weight-medium">
+            {{scope.row.quiz_show}}
+            <span><v-btn small>预览</v-btn></span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="练习"
+        prop="exer_num"
+        min-width="8%"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        label="AC%"
+        prop="accuracy"
+        min-width="8%"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        label="下载"
+        min-width="8%"
+        align="center"
+      >
+        <template slot-scope="scope">
+          <v-icon class="pointer" @click="download(scope.row.quiz_id)">{{scope.row.icon}}</v-icon>
+        </template>
+      </el-table-column>
+    </el-table>
+  </v-card>
 </template>
 
 <script>
@@ -85,7 +93,12 @@
        })
      },
      download(quizId){
-       this.$axios.post("api/download/", JSON.stringify({"quiz_id": quizId}), {responseType: 'blob'}).then(res => {
+       this.$axios.post("api/download/", JSON.stringify({
+         "quiz_id": quizId,
+         "user_id": this.userid,
+       }),{
+         responseType: 'blob'
+       }).then(res => {
          var blob = res.data
          let url = window.URL.createObjectURL(blob)
          let link = document.createElement('a')
@@ -103,13 +116,9 @@
      this.show_quiz()
    },
    computed: {
-     pages () {
-       if (this.pagination.rowsPerPage == null ||
-           this.pagination.totalItems == null
-       ) return 0
-
-       return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
+     userid(){
+       return this.$store.state.userid
      }
-   }
+   },
  }
 </script>

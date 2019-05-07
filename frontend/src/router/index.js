@@ -4,8 +4,8 @@ import TheHome from '@/components/TheHome'
 import TheQuiz from '@/components/TheQuiz'
 import TheDiscuss from '@/components/TheDiscuss'
 import TheLearn from '@/components/TheLearn'
-import TheBlank from '@/components/TheBlank'
 import DiscussPost from '@/components/DiscussPost'
+import UserInfo from '@/components/UserInfo'
 
 Vue.use(Router)
 
@@ -37,9 +37,9 @@ export default new Router({
 	    component: TheLearn
 	},
 	{
-	    path: '/blank',
-	    name: 'TheBlank',
-	    component: TheBlank
+	    path: '/user/:username',
+	    name: 'userInfo',
+	    component: UserInfo
 	},
     ]
 })

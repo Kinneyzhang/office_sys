@@ -106,6 +106,9 @@ class QuizBank(models.Model):
         verbose_name = '题库'
         verbose_name_plural = '1. 题库'
 
+    def __str__(self):
+        return self.quizId
+
 
 class ExerRecord(models.Model):
     user = models.ForeignKey(
@@ -118,15 +121,15 @@ class ExerRecord(models.Model):
         on_delete=models.CASCADE,
         verbose_name="试题"
     )
-    resultInfo = models.TextField(max_length=1000, verbose_name="批阅反馈")
-    quizScore = models.IntegerField(verbose_name="得分")
-    uploadFilename = models.CharField(max_length=20, verbose_name="文件名")
-    uploadStatus = models.BooleanField(verbose_name="是否已上传")
-    correctStatus = models.BooleanField(verbose_name="是否已批阅")
-    downloadTime = models.DateTimeField(verbose_name="下载时间")
-    uploadTime = models.DateTimeField(verbose_name="上传时间")
-    correctTime = models.DateTimeField(verbose_name="批阅时间")
-    correctFlag = models.BooleanField(verbose_name="可否批阅")
+    resultInfo = models.TextField(max_length=1000, null=True, verbose_name="批阅反馈")
+    quizScore = models.IntegerField(null=True, verbose_name="得分")
+    uploadFilename = models.CharField(null=True, max_length=20, verbose_name="文件名")
+    uploadStatus = models.BooleanField(default=False, verbose_name="是否已上传")
+    correctStatus = models.BooleanField(default=False, verbose_name="是否已批阅")
+    downloadTime = models.DateTimeField(auto_now_add=True, verbose_name="下载时间")
+    uploadTime = models.DateTimeField(null=True, verbose_name="上传时间")
+    correctTime = models.DateTimeField(null=True, verbose_name="批阅时间")
+    correctFlag = models.BooleanField(default=True, verbose_name="可否批阅")
 
     class Meta:
         db_table = 'exer_record'
