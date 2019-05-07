@@ -4,11 +4,15 @@
   >
     <!-- <app-sidebar></app-sidebar> -->
     <app-toolbar></app-toolbar>
+    
     <v-content>
       <v-container fill-height>
         <v-layout fluid>
-          <v-flex xs12 sm12 md12 fill-height>
+          <v-flex xs9 sm9 md9 fill-height mr-2>
             <router-view v-if="isRouterAlive"></router-view>
+          </v-flex>
+          <v-flex xs3 sm3 md3 fill-height>
+            <app-sidebar></app-sidebar>
           </v-flex>
         </v-layout>
       </v-container>

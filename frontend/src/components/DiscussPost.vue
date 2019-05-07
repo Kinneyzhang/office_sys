@@ -1,97 +1,97 @@
 <template>
-  <v-layout row>
-    <v-flex md8 sm8 mr-2>
-      <!-- 帖子标题内容板块 -->
-      <v-card class="elevation-1">
-        <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
-        <p class="overflow headline font-weight-bold px-3">{{postTitle}}</p>
-        <span class="grey--text font-weight-medium ml-3">{{postPerson}}</span>
-        <v-divider></v-divider>
-        <div class="pl-3 pr-3">
-          <v-layout row justify-center>
-            <v-flex md12 sm12>
-              <p class="overflow pl-3 pr-2">{{postContent}}</p>
-            </v-flex>
-          </v-layout>
-          <v-layout row justify-center>
-            <v-flex md6 sm6>
-              <v-bottom-sheet
-                v-model="post_sheet"
-                inset>
-                <template v-slot:activator>
-                  <v-btn flat small class="grey--text">
-                    <v-icon>reply</v-icon>回复
-                  </v-btn>
-                </template>
-                <v-list class="pa-2">
-                  <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
-                  <v-textarea
-                    v-model="reply_content"
-                    :rules="[() => !!reply_content || '输入不能为空!']"
-                    label="回复楼主"
-                    required
-                    flat
-                    outline
-                    placeholder="输入回复的内容"
-                    rows=6>
-                  </v-textarea>
-                  <v-btn small @click="create_post_reply" class="font-weight-bold">回复</v-btn>
-                  <v-btn small @click="cancle_post_sheet" class="font-weight-bold">取消</v-btn>
-                </v-list>
-              </v-bottom-sheet>
-            </v-flex>
-          </v-layout>
-        </div>
-      </v-card>
-      <!-- 回复板块 -->
-      <v-card class="mt-4">
-        <div v-for="(item, index) in replyList" class="reply_box">
-          <v-layout row justify-center>
-            <v-flex md10 sm10>
-              <div class="pl-5 pt-3">
-                <span class="grey--text font-weight-medium">{{item.reply_from}}</span>
-                <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{timeFormat(item.reply_time)}}</span>
-                <p class="overflow mt-2">
-                  <span v-show="isShow(item.reply_to)" class="grey--text">@{{item.reply_to}}&nbsp;&nbsp;</span>
-                  {{item.reply_content}}
-                </p>
-              </div>
-            </v-flex>
-            <!-- 弹出输入框 -->
-            <v-flex md2 sm2>
-              <v-bottom-sheet v-model="item.reply_sheet" inset>
-                <template v-slot:activator>
-                  <v-btn flat small class="grey--text" @click="reply_reply(item.reply_from)">
-                    <v-icon>{{item.reply_icon}}</v-icon>回复
-                  </v-btn>
-                </template>
-                <v-list class="pa-2">
-                  <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
-                  <v-textarea
-                    v-model="reply_content"
-                    :rules="[() => !!reply_content || '输入不能为空!']"
-                    :label= "reply_other"
-                    flat
-                    outline
-                    placeholder="输入回复的内容"
-                    rows=6>
-                  </v-textarea>
-                  <v-btn small @click="create_reply_reply(item.reply_from, index)" class="font-weight-bold">回复</v-btn>
-                  <v-btn small @click="cancle_reply_sheet(index)" class="font-weight-bold">取消</v-btn>
-                </v-list>
-              </v-bottom-sheet>
-            </v-flex>
-          </v-layout>
-          <!-- <v-divider v-if="index + 1 < replyList.length" :key="`divider-${index}`"></v-divider> -->
-        </div>
-      </v-card>
-    </v-flex>
-    <v-flex md4 sm4>
-      <v-card>
-        2222222222
-      </v-card>
-    </v-flex>
-  </v-layout>
+  <!-- 帖子标题内容板块 -->
+  <div>
+    <v-card class="elevation-1">
+      <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
+      <p class="overflow headline font-weight-bold px-3">{{postTitle}}</p>
+      <span class="grey--text font-weight-medium ml-3">{{postPerson}}</span>
+      <v-divider></v-divider>
+      <div class="pl-3 pr-3">
+        <v-layout row justify-center>
+          <v-flex md12 sm12>
+            <p class="overflow pl-3 pr-2">{{postContent}}</p>
+          </v-flex>
+        </v-layout>
+        <v-layout row justify-center>
+          <v-flex md3 sm3>
+            <v-bottom-sheet
+              v-model="post_sheet"
+              inset>
+              <template v-slot:activator>
+                <v-btn flat small class="grey--text">
+                  <v-icon small>reply</v-icon>回复
+                </v-btn>
+              </template>
+              <v-list class="pa-2">
+                <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
+                <v-textarea
+                  v-model="reply_content"
+                  :rules="[() => !!reply_content || '输入不能为空!']"
+                  label="回复楼主"
+                  auto-grow
+                  required
+                  flat
+                  outline
+                  placeholder="输入回复的内容"
+                  rows=6>
+                </v-textarea>
+                <v-btn small @click="create_post_reply" class="font-weight-bold">回复</v-btn>
+                <v-btn small @click="cancle_post_sheet" class="font-weight-bold">取消</v-btn>
+              </v-list>
+            </v-bottom-sheet>
+          </v-flex>
+          <v-flex md3 sm3>
+            <v-btn flat small class="grey--text">
+              <v-icon small>favorite</v-icon>收藏
+            </v-btn>
+          </v-flex>
+        </v-layout>
+      </div>
+    </v-card>
+    <!-- 回复板块 -->
+    <v-card class="mt-4">
+      <div v-for="(item, index) in replyList" class="reply_box">
+        <v-layout row justify-center align-center>
+          <v-flex md10 sm10>
+            <div class="pl-5 pt-3">
+              <span class="grey--text font-weight-medium">{{item.reply_from}}</span>
+              <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{timeFormat(item.reply_time)}}</span>
+              <p class="overflow mt-2">
+                <span v-show="isShow(item.reply_to)" class="grey--text">@{{item.reply_to}}&nbsp;&nbsp;</span>
+                {{item.reply_content}}
+              </p>
+            </div>
+          </v-flex>
+          <!-- 弹出输入框 -->
+          <v-flex md2 sm2>
+            <v-bottom-sheet v-model="item.reply_sheet" inset>
+              <template v-slot:activator>
+                <v-btn flat small class="grey--text" @click="reply_reply(item.reply_from)">
+                  <v-icon>{{item.reply_icon}}</v-icon>回复
+                </v-btn>
+              </template>
+              <v-list class="pa-2">
+                <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
+                <v-textarea
+                  v-model="reply_content"
+                  :rules="[() => !!reply_content || '输入不能为空!']"
+                  :label= "reply_other"
+                  auto-grow
+                  flat
+                  outline
+                  placeholder="输入回复的内容"
+                  rows=6>
+                </v-textarea>
+                <v-btn small @click="create_reply_reply(item.reply_from, index)" class="font-weight-bold">回复</v-btn>
+                <v-btn small @click="cancle_reply_sheet(index)" class="font-weight-bold">取消</v-btn>
+              </v-list>
+            </v-bottom-sheet>
+          </v-flex>
+        </v-layout>
+        <!-- <v-divider v-if="index + 1 < replyList.length" :key="`divider-${index}`"></v-divider> -->
+      </div>
+    </v-card>
+  </div>
 </template>
 
 <script>

@@ -1,10 +1,8 @@
 <template>
   <div>
     <div class="hidden-sm-and-down" v-show="islogin">
-      欢迎，{{login_usrname}}
-      <router-link to="/">
-        <v-btn flat @click="logout" outline small>退出登陆</v-btn>        
-      </router-link>
+      {{login_usrname}}
+      <v-btn flat @click="logout" outline small>退出登陆</v-btn>
     </div>
     
     <div class="hidden-sm-and-down" v-show="!islogin">
@@ -111,6 +109,7 @@
 
 <script>
  export default{
+   inject: ['reload'],
    data: () => ({
      login_dialog: false,
      register_dialog: false,
@@ -141,6 +140,7 @@
              this.password1 = ""
              this.password2 = ""
            }
+           this.reload()
          }).catch(err => {
            console.log(err)
          })
@@ -165,6 +165,7 @@
              userid: sessionStorage.getItem("userid"),
            })
          }
+         this.reload()
          console.log(res.data)
        }).catch( err => {
          console.log(err)
@@ -181,6 +182,7 @@
        this.password1 = "";
        this.password2 = "";
        this.msg = "";
+       this.reload()
      },
    },
    computed: {

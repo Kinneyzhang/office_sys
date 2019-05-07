@@ -61,6 +61,7 @@
                   placeholder="在输入内容前，请先选择合适的标签类型"
                   rows=6>
                 </v-textarea>
+                <div id="editor"></div>
                 <v-btn small @click="create_post" class="font-weight-bold">创建主题</v-btn>
                 <v-btn small @click="cancle" class="font-weight-bold">取消</v-btn>
               </v-list>
@@ -241,6 +242,10 @@
        this.$router.push({ name: 'discussPost', params: {'id': thisId}})
      },
    },
+   /* mounted(){
+    *   CKEDITOR.replace("editor", {height: "300px", width: "100%", toolbar: "Full"});
+    *   var editor = CKEDITOR.instances.editor2;
+    * }, */
    created(){
      this.get_tagNum()
      this.get_post_list()

@@ -32,6 +32,10 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 
+// import CKEDITOR from '../static/ckeditor.js'
+// import '../static/config.js'
+// import '../static/styles.js'
+
 import axios from 'axios'
 Vue.prototype.$axios = axios
 axios.defaults.baseURL = 'http://localhost:8000/'
