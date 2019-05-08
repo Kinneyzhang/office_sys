@@ -67,4 +67,7 @@
    text-overflow:ellipsis;
    overflow:hidden;
  }
+ .v-progress-circular{
+   margin: 1rem   
+ }
 </style>

@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import User, QuizBank, Post, PostTag, PostReply, ExerRecord
 import json
 import datetime
+import django.utils.timezone as timezone
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -109,7 +110,7 @@ def download(request):
     return response
 
 
-def get_record(request):
+def get_quiz_record(request):
     req = json.loads(request.body.decode())
     userName = req["username"]
     recordList = []
@@ -125,24 +126,59 @@ def get_record(request):
             'result_info': r.resultInfo,
             'upload_time': r.uploadTime,
             'correct_status': r.correctStatus,
+            'record_id': r.id,
+        })
+
+    return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
+
+
+def get_post_record(request):
+    req = json.loads(request.body.decode())
+    userName = req["username"]
+    recordList = []
+    recordSet = Post.objects.filter(postPerson=User.objects.get(userName=userName))
+    for r in recordSet:
+        recordList.append({
+            'post_id': r.id,
+            'poster': r.postPerson.userName,
+            'post_title': r.postTitle,
+            'post_tag': r.postTag.postTag,
+            'post_create_time': r.postCreateTime,
+            'post_modify_time': r.postModifyTime,
+            'reply_num': len(r.postReply.all()),
+            'view_num': r.postViewNum,
         })
 
     return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
 
 
 def upload(request):
-    if request.method == 'POST':
-        fileObj = request.FILES.get('file')
-        print(fileObj)
-        # req = json.loads(request.body.decode())
-        # print(req["userid"])
-        f = open(
-            os.path.join(BASE_DIR, 'upload', 'user_upload', fileObj.name), 'wb'
-        )
-        for chunk in fileObj.chunks():
-            f.write(chunk)
-            f.close()
-        return JsonResponse({'msg': 'OK'})
+    fileObj = request.FILES.get('file')
+    user_id = request.POST.get('userId')
+    record_id = request.POST.get('recordId')
+    print(record_id)
+    upload_dir = os.path.join(BASE_DIR, 'upload', 'user_upload', 'user_%s' % user_id)
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    upload_path = os.path.join(upload_dir, fileObj.name)
+    # try:
+    #     with open(upload_path, mode='rb') as f:
+    #         pass
+    # except FileNotFoundError:
+    #     with open(upload_path, mode='wb') as f:
+    #         print("文件创建成功！")
+
+    f = open(upload_path, 'wb')
+    for chunk in fileObj.chunks():
+        f.write(chunk)
+        f.close()
+
+    # The reason for this error is that .get() returns an individual object and.update() only works on querysets, such as what would be returned with .filter() instead of .get().
+    ExerRecord.objects.filter(pk=record_id).update(uploadStatus=True, uploadTime=datetime.datetime.now())
+    # print(type(record))
+    # record.save()
+
+    return JsonResponse({'msg': 'OK'})
 
 
 def create_post(request):
@@ -227,6 +263,8 @@ def create_post_reply(request):
         replyContent=reply_content
     )
     Post.objects.get(pk=reply_post).postReply.add(post_reply)
+    # 写入post的活动时间
+    Post.objects.filter(pk=reply_post).update(postModifyTime=datetime.datetime.now())
 
     return JsonResponse({"msg": "回复成功！"})
 
@@ -280,5 +318,7 @@ def create_reply_reply(request):
         replyContent=reply_content
     )
     Post.objects.get(pk=reply_post).postReply.add(post_reply)
+    # 写入post的活动时间
+    Post.objects.filter(pk=reply_post).update(postModifyTime=datetime.datetime.now())
 
     return JsonResponse({"msg": "回复成功！"})

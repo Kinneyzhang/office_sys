@@ -18,7 +18,7 @@
         <template slot-scope="scope">
           <div class="font-weight-medium">
             {{scope.row.quiz_show}}
-            <span><v-btn small>预览</v-btn></span>
+            <span><v-btn flat small color="info">预览</v-btn></span>
           </div>
         </template>
       </el-table-column>

@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 import django.contrib.auth.models as admin
+import datetime
+from django.utils import timezone
 
 
 class User(models.Model):
@@ -192,7 +194,7 @@ class Post(models.Model):
         related_name="reply"
     )
     postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
-    postModifyTime = models.DateTimeField(auto_now=True, verbose_name="修改时间")
+    postModifyTime = models.DateTimeField(default=timezone.now, verbose_name="修改时间")
     postViewNum = models.IntegerField(default=0, verbose_name="浏览量")
 
     class Meta:
