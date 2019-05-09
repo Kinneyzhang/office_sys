@@ -84,10 +84,37 @@ def login(request):
     )
 
 
-def show_quiz(request):
+def get_quiz(request):
     quiz = QuizBank.objects.all()
-    quiz_list = list(quiz.values('quizId', 'quizText'))
+    quiz_list = []
+    uploadNum = 0
+    accuracy = 1.0
+    temp = 0
+    for q in quiz:
+        # 获取试题的知识点
+        # 计算平均正确率
 
+        knowledgePoint = list(q.quizKnowledgePoint.all().values('knowledgePoint'))
+        try:
+            record = ExerRecord.objects.filter(quiz=q).filter(correctStatus=True)
+            uploadNum = len(ExerRecord.objects.filter(quiz=q).filter(uploadStatus=True))
+ 
+            for r in record:
+                temp += r.quizScore / q.quizFullScore
+            try:
+                accuracy = round(temp / len(record), 2)
+            except ZeroDivisionError:
+                pass
+        except ExerRecord.DoesNotExist:
+            pass
+
+        quiz_list.append({
+            'quizId': q.quizId,
+            'quizText': q.quizText,
+            'knowledgePoint': knowledgePoint,
+            'uploadNum': uploadNum,
+            'accuracy': accuracy,
+        })
     return JsonResponse(json.dumps(quiz_list), safe=False)
 
 
@@ -178,7 +205,7 @@ def upload(request):
     # print(type(record))
     # record.save()
 
-    return JsonResponse({'msg': 'OK'})
+    return JsonResponse({'msg': 'upload successfully!'})
 
 
 def create_post(request):

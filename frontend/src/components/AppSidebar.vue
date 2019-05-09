@@ -7,6 +7,19 @@
       </div>
       <router-link v-else :to="userinfo" class="font-weight-medium subheading pointer">欢迎，{{userName}}!</router-link>
     </v-card-title>
+    <v-list>
+      <v-list-tile>
+        <router-link to="/">
+          <v-icon>create</v-icon>&nbsp;创建新主题
+        </router-link>
+      </v-list-tile>
+      <v-list-tile>
+        <router-link to="/">
+          <v-icon>cloud_upload</v-icon>&nbsp;上传答案
+        </router-link>
+      </v-list-tile>
+    </v-list>
+    
   </v-card>
 </template>
 

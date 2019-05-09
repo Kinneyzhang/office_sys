@@ -32,13 +32,13 @@
           <div class="text-xs-center">
             <v-bottom-sheet v-model="sheet" inset>
               <template v-slot:activator>
-                <v-btn color="purple" dark><v-icon>add</v-icon>发表帖子</v-btn>
+                <v-btn color="purple" dark><v-icon>add</v-icon>创建主题</v-btn>
               </template>
               <v-list class="pa-2">
-                <div class="mb-2"><v-icon>reply</v-icon>&nbsp;&nbsp;创建新的帖子</div><br>
+                <div class="mb-2"><v-icon>reply</v-icon>&nbsp;&nbsp;创建新的主题</div><br>
                 <v-textarea
                   v-model="postTitle"
-                  label="帖子标题"
+                  label="主题标题"
                   flat
                   outline
                   auto-grow
@@ -55,7 +55,7 @@
                 ></v-select>
                 <v-textarea
                   v-model="postContent"
-                  label="帖子内容"
+                  label="主题内容"
                   flat
                   outline
                   placeholder="在输入内容前，请先选择合适的标签类型"

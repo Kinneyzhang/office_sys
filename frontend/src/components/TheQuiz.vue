@@ -7,29 +7,27 @@
       <el-table-column
         label="编号"
         prop="quiz_id"
-        min-width="8%"
+        min-width="10%"
         align="center"
       ></el-table-column>
       <el-table-column
         label="试题"
-        min-width="68%"
-        align="center"
+        min-width="66%"
+        align="left"
       >
         <template slot-scope="scope">
-          <div class="font-weight-medium">
-            {{scope.row.quiz_show}}
-            <span><v-btn flat small color="info">预览</v-btn></span>
-          </div>
+          <div class="font-weight-medium" v-html="scope.row.quiz_text"></div>
+          <!-- <span><v-btn flat small color="info">预览</v-btn></span> -->
         </template>
       </el-table-column>
       <el-table-column
-        label="练习"
-        prop="exer_num"
+        label="已练习"
+        prop="upload_num"
         min-width="8%"
         align="center"
       ></el-table-column>
       <el-table-column
-        label="AC%"
+        label="正确率"
         prop="accuracy"
         min-width="8%"
         align="center"
@@ -54,38 +52,36 @@
        search: '',
        pagination: {},
        selected: [],
-       headers: [
-         { text: '编号', align: 'left', value: 'quiz_id' },
-         { text: '试题', align: 'center', sortable: false, value: 'quiz_show' },
-         { text: '练习', align: 'left', value: 'exer_num' },
-         { text: 'AC%', align: 'left', value: 'accuracy' },
-         { text: '下载', align: 'left', sortable: false, value: 'icon'},
-       ],
        quizlist: []
      }
    },
    methods: {
-     show_quiz(){
-       this.$axios.get("api/show_quiz/").then(res => {
+     get_quiz(){
+       this.$axios.get("api/get_quiz/").then(res => {
          console.log(res.data)
          res = JSON.parse(res.data)
          var quizId = res.map(v => v.quizId)
          var quizText = res.map(v => v.quizText)
-         var temp = ""
+         var uploadNum = res.map(v => v.uploadNum)
+         var accuracy = res.map(v => v.accuracy)
+         var knowledgePoint = res.map(v => v.knowledgePoint)
+
+         var knowledge_point = []
          var quizStr = []
-         var quizShow = []
          for(var i=0; i<quizId.length; i++){
-           temp = quizText[i].slice(0,75) + " . . . . . ."
-           quizShow.push(temp)
+           quizStr.push(quizText[i].split('；').join('；<br>'))
+           /* console.log(quizStr[i]) */
          }
          for(var i=0; i<quizId.length; i++){
-           temp = quizText[i].split('；').join('\n')
-           quizStr.push(temp)
-           console.log(quizStr[i])
-         }
-         for(var i=0; i<quizId.length; i++){
-           this.quizlist.push(
-             {quiz_id: quizId[i], quiz_show: quizShow[i], quiz_text: quizStr[i], exer_num: 5, accuracy: '80%', icon: 'get_app'})
+           knowledge_point = knowledgePoint[i].map(v => v.knowledgePoint)
+           this.quizlist.push({
+             quiz_id: quizId[i],
+             quiz_text: quizStr[i],
+             upload_num: uploadNum[i],
+             accuracy: accuracy[i]*100 + '%',
+             knowledge_point: knowledge_point[i],
+             icon: 'get_app'
+           })
          }
          /* console.log(res.data) */
        }).catch(err => {
@@ -113,7 +109,7 @@
      }
    },
    created(){
-     this.show_quiz()
+     this.get_quiz()
    },
    computed: {
      userid(){

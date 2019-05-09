@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-card class="elevation-1">
+      <input type="file" class="uploadHide" ref="file" multiple accept=".zip, .rar" @change="getFile($event)">
       <v-card-title>
         <span class="display-1 font-weight-bold">{{userName}}</span>
-        <input type="file" id="upload" ref="file" multiple accept=".zip, .rar" @change="getFile($event)">
       </v-card-title>
       <v-card-text>
         <span class="subheading grey--text">本站第 1 位用户，注册时间：2019-05-07</span>
@@ -26,7 +26,7 @@
           :key="index"
         >
           <div v-if="index == 0">
-            <div v-for="(item, index) in download_list" class="downloadBox">
+            <div v-for="(item, i) in download_list" class="downloadBox">
               <v-layout row justify-center align-center>
                 <v-flex md10 sm10>
                   <div class="pl-5 pt-3">
@@ -39,6 +39,7 @@
                   <div v-if="!item.upload_status">
                     <form>
                       <v-btn small flat class="grey--text" @click="popWindow"><u>选择文件</u></v-btn>
+                      <span>{{file.name}}</span>
                       <v-btn small color="info" flat @click="upload($event,item.record_id)">
                         <v-icon color="info">publish</v-icon>上传
                       </v-btn>
@@ -53,7 +54,7 @@
           </div>
           
           <div v-if="index == 1">
-            <div v-for="(item, index) in exer_list" class="downloadBox">
+            <div v-for="(item, i) in exer_list" class="downloadBox">
               <v-layout row justify-center align-center>
                 <v-flex md12 sm12>
                   <div class="pl-5 pt-3">
@@ -151,6 +152,15 @@
          return "/post/" + post_id
        }
      },
+     /* fileInput(){
+      *   return (index) => {
+      *     this.$store.commit({
+      *       type: 'fileInput',
+      *       fileInput: "file"+index,
+      *     })
+      *     return "file" + index
+      *   }
+        }, */
      timeFormat(){
        return function(time){
          //如果时间格式是正确的，那下面这一步转化时间格式就可以不用了
@@ -231,6 +241,7 @@
        console.log(this.file);
      },
      popWindow(){
+       /* var file = "file"+index */
        let uploadBtn = this.$refs.file
        uploadBtn.click()
      },
@@ -298,7 +309,7 @@
  .downloadBox{
    border-bottom: 0.1px solid #E0E0E0;
  }
- #upload{
+ .uploadHide{
    height: 0;
    width: 0;
    visibility: hidden;
