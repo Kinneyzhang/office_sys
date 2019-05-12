@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import User, QuizBank, Post, PostTag, PostReply, ExerRecord
 import json
 import datetime
-import django.utils.timezone as timezone
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -58,6 +57,7 @@ def login(request):
     password = user_info["password"]
     userid = 0
     islogin = False
+    registertime = ""
 
     request.session.flush()
     # if request.session.get('is_login', True):
@@ -72,6 +72,8 @@ def login(request):
         if password == u.userPasswd:
             islogin = True
             userid = User.objects.get(userName=username).id
+            registertime = User.objects.get(userName=username).registerTime.strftime('%Y-%m-%d %H:%I:%S')
+            print(registertime)
             msg = "登陆成功！"
         else:
             msg = "密码输入错误！"
@@ -79,7 +81,8 @@ def login(request):
     return JsonResponse(
         {
             "msg": msg, "user_id": userid,
-            "user_name": username, "is_login": islogin
+            "user_name": username, "is_login": islogin,
+            "register_time": registertime,
         }
     )
 
@@ -139,8 +142,13 @@ def download(request):
 
 def get_quiz_record(request):
     req = json.loads(request.body.decode())
-    userName = req["username"]
     recordList = []
+    # 当用户退出登录时，会产生异常
+    try:
+        userName = req["username"]
+    except BaseException:
+        return JsonResponse(json.dumps(recordList), safe=False)
+
     recordSet = ExerRecord.objects.filter(user=User.objects.get(userName=userName))
     for r in recordSet:
         recordList.append({
@@ -161,8 +169,13 @@ def get_quiz_record(request):
 
 def get_post_record(request):
     req = json.loads(request.body.decode())
-    userName = req["username"]
     recordList = []
+    # 当用户退出登录时，会产生异常
+    try:
+        userName = req["username"]
+    except BaseException:
+        return JsonResponse(json.dumps(recordList), safe=False)
+
     recordSet = Post.objects.filter(postPerson=User.objects.get(userName=userName))
     for r in recordSet:
         recordList.append({
@@ -201,7 +214,7 @@ def upload(request):
         f.close()
 
     # The reason for this error is that .get() returns an individual object and.update() only works on querysets, such as what would be returned with .filter() instead of .get().
-    ExerRecord.objects.filter(pk=record_id).update(uploadStatus=True, uploadTime=datetime.datetime.now())
+    ExerRecord.objects.filter(pk=record_id).update(uploadStatus=True, uploadTime=datetime.datetime.now(), uploadFilename=fileObj.name)
     # print(type(record))
     # record.save()
 

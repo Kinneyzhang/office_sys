@@ -8,26 +8,17 @@ const store = new Vuex.Store({
 	islogin: false,
 	username: null,
 	userid: null,
+	registertime: null,
 	drawer: true,
 	fileInput: null,
     },
     mutations: {
 	login(state, payload) {
+	    state.registertime = payload.registertime,
             state.islogin = payload.islogin,
 	    state.username = payload.username,
 	    state.userid = payload.userid
-	},
-	drawer(state, payload) {
-	    state.drawer = payload.drawer
-	},
-	fileInput(state, payload) {
-	    state.fileInput = payload.fileInput
-	},
-    },
-    getters: {
-	drawer: (state) => {
-	    return state.drawer
-	},
+	}
     }
 })
 

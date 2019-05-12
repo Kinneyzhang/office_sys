@@ -158,15 +158,17 @@
            sessionStorage.setItem("islogin", res.data.is_login)
            sessionStorage.setItem("username", res.data.user_name)
            sessionStorage.setItem("userid", res.data.user_id)
+           sessionStorage.setItem("registertime", res.data.register_time)
            this.$store.commit({
              type: 'login',
              islogin: sessionStorage.getItem("islogin"),
              username: sessionStorage.getItem("username"),
              userid: sessionStorage.getItem("userid"),
+             registertime: sessionStorage.getItem("registertime")
            })
          }
-         this.reload()
          console.log(res.data)
+         /* this.reload() */
        }).catch( err => {
          console.log(err)
        })
@@ -175,7 +177,8 @@
        sessionStorage.clear()
        this.$store.commit({
          type: 'login',
-         islogin: false
+         islogin: false,
+         username: null,
        })
        this.username = "";
        this.password = "";
@@ -186,13 +189,14 @@
      },
    },
    computed: {
-     islogin(){
+     islogin(){ // 很重要！！通过登陆状态的计算属性，每次刷新时commit用户信息。保证随时可以获取。为什么要用vuex，直接用sessionStorage行不行？？？
        if(sessionStorage.getItem("username") && sessionStorage.getItem("islogin")){
          this.$store.commit({
            type: 'login',
            islogin: sessionStorage.getItem("islogin"),
            username: sessionStorage.getItem("username"),
            userid: sessionStorage.getItem("userid"),
+           registertime: sessionStorage.getItem("registertime")
          })
        }else{
          this.$store.commit({
@@ -205,6 +209,7 @@
      },
      login_usrname(){
        return this.$store.state.username
+       /* return sessionStorage.getItem("username") */
      },
      login_usrid(){
        return this.$store.state.userid

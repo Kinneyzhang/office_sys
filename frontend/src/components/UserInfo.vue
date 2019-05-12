@@ -6,7 +6,7 @@
         <span class="display-1 font-weight-bold">{{userName}}</span>
       </v-card-title>
       <v-card-text>
-        <span class="subheading grey--text">本站第 1 位用户，注册时间：2019-05-07</span>
+        <span class="subheading grey--text">本站第 {{userId}} 位用户，加入时间：{{registerTime}}</span>
       </v-card-text>
     </v-card>
     <v-card class="elevation-1 mt-4">
@@ -27,49 +27,45 @@
         >
           <div v-if="index == 0">
             <div v-for="(item, i) in download_list" class="downloadBox">
-              <v-layout row justify-center align-center>
-                <v-flex md10 sm10>
-                  <div class="pl-5 pt-3">
-                    <span class="font-weight-medium">{{item.quiz_id}}</span>
-                    <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.download_time}}&nbsp;下载</span>
-                    <p class="mt-2 overflow2">{{item.quiz_text}}</p>
-                  </div>
-                </v-flex>
-                <v-flex md2 sm2 align-center justify-center>
-                  <div v-if="!item.upload_status">
-                    <form>
-                      <v-btn small flat class="grey--text" @click="popWindow"><u>选择文件</u></v-btn>
-                      <span>{{file.name}}</span>
-                      <v-btn small color="info" flat @click="upload($event,item.record_id)">
-                        <v-icon color="info">publish</v-icon>上传
-                      </v-btn>
-                    </form>
-                  </div>
-                  <div v-else>
-                    <span class="grey--text mr-2">答案已提交</span>
-                  </div>
-                </v-flex>
-              </v-layout>
+              <!-- <v-layout row justify-center align-center>
+                   <v-flex md10 sm10> -->
+              <div class="pl-4 py-2">
+                <span class="font-weight-medium">{{item.quiz_id}}</span>
+                <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.download_time}}&nbsp;下载</span>
+                <div v-if="!item.upload_status">
+                  <form>
+                    <v-btn small flat class="grey--text" @click="popWindow"><u>选择文件</u></v-btn>
+                    <v-btn small color="info" flat @click="upload($event,item.record_id)">
+                      <v-icon color="info">publish</v-icon>上传
+                    </v-btn>
+                  </form>
+                </div>
+                <div v-else>
+                  <v-btn small flat class="grey--text">答案已提交</v-btn>
+                </div>
+                <p class="mt-2 overflow2">{{item.quiz_text}}</p>
+              </div>
+              <!-- </v-flex>
+                   <v-flex md2 sm2 align-center justify-center> -->
+              
+              <!-- </v-flex>
+                   </v-layout> -->
             </div>
           </div>
           
           <div v-if="index == 1">
             <div v-for="(item, i) in exer_list" class="downloadBox">
-              <v-layout row justify-center align-center>
-                <v-flex md12 sm12>
-                  <div class="pl-5 pt-3">
-                    <span class="font-weight-medium">{{item.quiz_id}}</span>
-                    <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.upload_time}}&nbsp;提交答案</span>
-                    <div v-if="!item.correct_status">
-                      <span class="grey--text darken-3">该试题尚未批阅</span>
-                    </div>
-                    <div v-else>
-                      <span>得分：{{item.quiz_score}}</span><br>
-                      <span>提示信息：{{item.result_info}}</span>
-                    </div>
-                  </div>
-                </v-flex>
-              </v-layout>
+              <div class="pa-4">
+                <span class="font-weight-medium">{{item.quiz_id}}</span>
+                <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.upload_time}}&nbsp;提交答案</span>
+                <div v-if="!item.correct_status">
+                  <span class="grey--text darken-3">该试题尚未批阅</span>
+                </div>
+                <div v-else>
+                  <span>得分：{{item.quiz_score}}</span><br>
+                  <span>提示信息：{{item.result_info}}</span>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -141,6 +137,10 @@
      }
    },
    computed: {
+     registerTime(){
+       console.log(this.$store.state.registertime)
+       return this.$store.state.registertime
+     },
      userName(){
        return this.$store.state.username
      },
@@ -239,6 +239,9 @@
      getFile(event) {
        this.file = event.target.files[0];
        console.log(this.file);
+       this.$message({
+         message: "即将上传的文件为"+this.file.name 
+       })
      },
      popWindow(){
        /* var file = "file"+index */
@@ -246,22 +249,28 @@
        uploadBtn.click()
      },
      upload(event, record_id){
-       event.preventDefault();
-       let formData = new FormData();
-       formData.append('file', this.file)
-       formData.append('userId', this.userId)
-       formData.append('recordId', record_id)
-       console.log(this.userId)
-       console.log(record_id)
-       let config = {
-         headers: {'Content-Type': 'multipart/form-data'}
+       if(!this.file){
+         this.$message({
+           message: "请先选择上传的文件！"
+         })
+       }else{
+         event.preventDefault();
+         let formData = new FormData();
+         formData.append('file', this.file)
+         formData.append('userId', this.userId)
+         formData.append('recordId', record_id)
+         console.log(this.userId)
+         console.log(record_id)
+         let config = {
+           headers: {'Content-Type': 'multipart/form-data'}
+         }
+         this.$axios.post('api/upload/', formData, config).then(res => {
+           console.log(res)
+           this.reload()
+         }).catch(err => {
+           console.log(err)
+         }) 
        }
-       this.$axios.post('api/upload/', formData, config).then(res => {
-         console.log(res)
-         this.reload()
-       }).catch(err => {
-         console.log(err)
-       })
      },
      get_post_record(){
        this.$axios.post("api/get_post_record/", JSON.stringify({
@@ -297,6 +306,23 @@
          console.log(err.data)
        })
      },
+   },
+   filters: {
+     dataFormat: function(time, pattern){
+       var dt = new Date(time)
+       var y = dt.getFullYear()
+       var m = (dt.getMonth() + 1).toString().padStart(2, '0') //padStart或者padEnd第一个参数为补全后的长度，第二参数为添加的字符串, 被补全的必须为字符串
+       var d = (dt.getDate() + 1).toString().padStart(2, '0')
+
+       if(pattern.toLowerCase() === 'y-m-d'){
+         return `${y}-${m}-${d}`
+       }else{
+         var hh = (dt.getHours() + 1).toString().padStart(2, '0')
+         var mm = (dt.getMinutes() + 1).toString().padStart(2, '0')
+         var ss =  (dt.getSeconds() + 1).toString().padStart(2, '0')
+         return `${y}-${m}-${d} ${hh}:${mm}:${ss}` 
+       }
+     }
    },
    created(){
      this.get_quiz_record()

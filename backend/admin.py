@@ -10,7 +10,7 @@ from backend.models import Post, PostReply, PostTag
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('userName', 'userPasswd')
+    list_display = ('userName', 'userPasswd', 'registerTime')
     search_fields = ('userName',)
 
 

@@ -11,30 +11,40 @@
         align="center"
       ></el-table-column>
       <el-table-column
-        label="试题"
-        min-width="66%"
-        align="left"
+        label="知识点"
+        min-width="30%"
+        prop="knowledge_point"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        label="题目预览"
+        min-width="30%"
+        align="center"
       >
         <template slot-scope="scope">
-          <div class="font-weight-medium" v-html="scope.row.quiz_text"></div>
-          <!-- <span><v-btn flat small color="info">预览</v-btn></span> -->
+          <v-menu bottom offset-y z-index="10">
+            <template v-slot:activator="{ on }">
+              <v-btn small flat v-on="on" class="blue--text">点击预览</v-btn>
+            </template>
+            <div class="quiz_text pa-3" v-html="scope.row.quiz_text"></div>
+          </v-menu>
         </template>
       </el-table-column>
       <el-table-column
         label="已练习"
         prop="upload_num"
-        min-width="8%"
+        min-width="10%"
         align="center"
       ></el-table-column>
       <el-table-column
         label="正确率"
         prop="accuracy"
-        min-width="8%"
+        min-width="10%"
         align="center"
       ></el-table-column>
       <el-table-column
         label="下载"
-        min-width="8%"
+        min-width="10%"
         align="center"
       >
         <template slot-scope="scope">
@@ -73,13 +83,13 @@
            /* console.log(quizStr[i]) */
          }
          for(var i=0; i<quizId.length; i++){
-           knowledge_point = knowledgePoint[i].map(v => v.knowledgePoint)
+           knowledge_point.push(knowledgePoint[i].map(v => v.knowledgePoint))
            this.quizlist.push({
              quiz_id: quizId[i],
              quiz_text: quizStr[i],
              upload_num: uploadNum[i],
              accuracy: accuracy[i]*100 + '%',
-             knowledge_point: knowledge_point[i],
+             knowledge_point: knowledge_point[i].join('  '),
              icon: 'get_app'
            })
          }
@@ -118,3 +128,10 @@
    },
  }
 </script>
+
+<style>
+ .quiz_text{
+   width: 400px;
+   background-color: white;
+ }
+</style>

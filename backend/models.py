@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 
 from django.db import models
 import django.contrib.auth.models as admin
-import datetime
 from django.utils import timezone
 
 
 class User(models.Model):
     userName = models.CharField(max_length=12, verbose_name="用户名")
     userPasswd = models.CharField(max_length=20, verbose_name="密码")
+    registerTime = models.DateTimeField(auto_now_add=True, verbose_name="注册时间")
 
     class Meta:
         db_table = 'user_info'
