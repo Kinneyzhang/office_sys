@@ -99,23 +99,29 @@
        })
      },
      download(quizId){
-       this.$axios.post("api/download/", JSON.stringify({
-         "quiz_id": quizId,
-         "user_id": this.userid,
-       }),{
-         responseType: 'blob'
-       }).then(res => {
-         var blob = res.data
-         let url = window.URL.createObjectURL(blob)
-         let link = document.createElement('a')
-         link.style.display = 'none'
-         link.href = url
-         link.setAttribute('download', quizId+'.zip')
-         document.body.appendChild(link)
-         link.click()
-       }).catch(err => {
-         console.log(err)
-       })
+       if(!this.$store.state.islogin){
+         this.$message({
+           message: '登录后才能下载试题！',
+         });
+       }else{
+         this.$axios.post("api/download/", JSON.stringify({
+           "quiz_id": quizId,
+           "user_id": this.userid,
+         }),{
+           responseType: 'blob'
+         }).then(res => {
+           var blob = res.data
+           let url = window.URL.createObjectURL(blob)
+           let link = document.createElement('a')
+           link.style.display = 'none'
+           link.href = url
+           link.setAttribute('download', quizId+'.zip')
+           document.body.appendChild(link)
+           link.click()
+         }).catch(err => {
+           console.log(err)
+         }) 
+       }
      }
    },
    created(){

@@ -8,7 +8,7 @@
     <v-content>
       <v-container fill-height>
         <v-layout fluid row>
-          <v-flex xs8 sm8 md8 mr-4 fill-height>
+          <v-flex xs9 sm9 md9 mr-4 fill-height>
             <router-view v-if="isRouterAlive"></router-view>
           </v-flex>
           <v-flex xs3 sm3 md3 fill-height>

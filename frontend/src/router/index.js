@@ -6,6 +6,9 @@ import TheDiscuss from '@/components/TheDiscuss'
 import TheLearn from '@/components/TheLearn'
 import DiscussPost from '@/components/DiscussPost'
 import UserInfo from '@/components/UserInfo'
+import UserDownload from '@/components/UserDownload'
+import UserExercise from '@/components/UserExercise'
+import UserPost from '@/components/UserPost'
 
 Vue.use(Router)
 
@@ -38,8 +41,21 @@ export default new Router({
 	},
 	{
 	    path: '/user/:username',
-	    name: 'userInfo',
-	    component: UserInfo
+	    component: UserInfo,
+	    children: [
+		{
+		    path: 'download',
+		    component: UserDownload
+		},
+		{
+		    path: 'exercise',
+		    component: UserExercise
+		},
+		{
+		    path: 'post',
+		    component: UserPost
+		}
+	    ]
 	},
     ]
 })

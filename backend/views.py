@@ -23,6 +23,8 @@ class ComplexEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
 
 
+# 注册登陆 ##############################################################
+
 @csrf_exempt
 def register(request):
     user_info = json.loads(request.body.decode())
@@ -87,6 +89,8 @@ def login(request):
     )
 
 
+# 试题展示 ##############################################################
+
 def get_quiz(request):
     quiz = QuizBank.objects.all()
     quiz_list = []
@@ -101,7 +105,7 @@ def get_quiz(request):
         try:
             record = ExerRecord.objects.filter(quiz=q).filter(correctStatus=True)
             uploadNum = len(ExerRecord.objects.filter(quiz=q).filter(uploadStatus=True))
- 
+
             for r in record:
                 temp += r.quizScore / q.quizFullScore
             try:
@@ -121,6 +125,8 @@ def get_quiz(request):
     return JsonResponse(json.dumps(quiz_list), safe=False)
 
 
+# 上传下载 ##################################################################
+
 def download(request):
     req = json.loads(request.body.decode())
     quizId = req["quiz_id"]
@@ -139,6 +145,168 @@ def download(request):
 
     return response
 
+
+def upload(request):
+    fileObj = request.FILES.get('file')
+    user_id = request.POST.get('userId')
+    record_id = request.POST.get('recordId')
+    print(record_id)
+    upload_dir = os.path.join(BASE_DIR, 'upload', 'user_upload', 'user_%s' % user_id)
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    upload_path = os.path.join(upload_dir, fileObj.name)
+    # try:
+    #     with open(upload_path, mode='rb') as f:
+    #         pass
+    # except FileNotFoundError:
+    #     with open(upload_path, mode='wb') as f:
+    #         print("文件创建成功！")
+
+    f = open(upload_path, 'wb')
+    for chunk in fileObj.chunks():
+        f.write(chunk)
+        f.close()
+
+    # The reason for this error is that .get() returns an individual object and.update() only works on querysets, such as what would be returned with .filter() instead of .get().
+    ExerRecord.objects.filter(pk=record_id).update(uploadStatus=True, uploadTime=datetime.datetime.now(), uploadFilename=fileObj.name)
+    # print(type(record))
+    # record.save()
+
+    return JsonResponse({'msg': 'upload successfully!'})
+
+
+# 帖子展示 ######################################################################
+
+def create_post(request):
+    req = json.loads(request.body.decode())
+    postUser = req["postUser"]
+    postTitle = req["postTitle"]
+    postTag = req["postTag"]
+    postContent = req["postContent"]
+    postTag = PostTag.objects.get(postTag=postTag)
+    postUser = User.objects.get(userName=postUser)
+    post = Post(
+        postTag=postTag, postTitle=postTitle,
+        postContent=postContent, postPerson=postUser
+    )
+    post.save()
+    return JsonResponse({"msg": "post create successfully!"})
+
+
+def get_tag_list(request):
+    # 获取每类标签的帖子的数量
+    tag_list = []
+    num = 0
+    TagSet = PostTag.objects.all()
+    for t in TagSet:  # 直接遍历QuerySet
+        if t is None:
+            num = 0  # 没有帖子的标签查询不到
+        else:
+            # Post模型中的postTag是外键,不是数据字符串
+            num = len(Post.objects.filter(postTag=t))
+            # print(num)
+        tag_list.append({"tagName": str(t), "tagNum": num})
+
+    return JsonResponse(json.dumps(tag_list), safe=False)
+
+
+def get_post_list(request):
+    # 获取post列表的相关信息
+    post_list = []
+    post = Post.objects.all()
+    for p in post:
+        post_list.append({
+            'post_id': p.id,
+            'poster': p.postPerson.userName,
+            'post_title': p.postTitle,
+            'post_tag': p.postTag.postTag,
+            'post_create_time': p.postCreateTime,
+            'post_modify_time': p.postModifyTime,
+            'reply_num': len(p.postReply.all()),
+            'view_num': p.postViewNum
+        })
+
+    return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)
+
+
+# 帖子回复 ###############################################################
+
+def get_reply(request):
+    reply_list = []
+    req = json.loads(request.body.decode())
+    post_id = req["post_id"]  # 不能和模型字段名一样，会报错
+    msg = ""
+
+    post = Post.objects.get(pk=post_id)
+    num = post.postViewNum+1
+    Post.objects.filter(pk=post_id).update(postViewNum=num)
+    postObj = {
+        'poster': post.postPerson.userName,
+        'post_title': post.postTitle,
+        'post_content': post.postContent,
+        'post_tag': post.postTag.postTag,
+        'post_create_time': post.postCreateTime,
+        'post_modify_time': post.postModifyTime,
+        'reply_num': len(post.postReply.all()),
+        'view_num': post.postViewNum,
+    }
+    reply_list.append(postObj)
+
+    try:
+        reply = post.postReply.all()
+    except reply.DoesNotExist:
+        msg = "该帖子尚无回复！"
+    else:
+        msg = "有回复"
+        for r in reply:
+            reply_list.append({
+                "reply_from": r.replyFrom.userName,
+                "reply_to": r.replyTo.userName,
+                "reply_content": r.replyContent,
+                "reply_time": r.replyTime,
+                "msg": msg
+            })
+
+    return JsonResponse(json.dumps(reply_list, cls=ComplexEncoder), safe=False)
+
+
+def create_post_reply(request):
+    req = json.loads(request.body.decode())
+    reply_from = req["reply_from"]
+    reply_to = req["reply_to"]
+    reply_content = req["reply_content"]
+    reply_post = req["reply_post"]
+    post_reply = PostReply.objects.create(
+        replyFrom=User.objects.get(pk=reply_from),
+        replyTo=User.objects.get(userName=reply_to),
+        replyContent=reply_content
+    )
+    Post.objects.get(pk=reply_post).postReply.add(post_reply)
+    # 写入post的活动时间
+    Post.objects.filter(pk=reply_post).update(postModifyTime=datetime.datetime.now())
+
+    return JsonResponse({"msg": "回复成功！"})
+
+
+def create_reply_reply(request):
+    req = json.loads(request.body.decode())
+    reply_from = req["reply_from"]
+    reply_to = req["reply_to"]
+    reply_content = req["reply_content"]
+    reply_post = req["reply_post"]
+    post_reply = PostReply.objects.create(
+        replyFrom=User.objects.get(pk=reply_from),
+        replyTo=User.objects.get(userName=reply_to),
+        replyContent=reply_content
+    )
+    Post.objects.get(pk=reply_post).postReply.add(post_reply)
+    # 写入post的活动时间
+    Post.objects.filter(pk=reply_post).update(postModifyTime=datetime.datetime.now())
+
+    return JsonResponse({"msg": "回复成功！"})
+
+
+# 个人记录 #################################################################
 
 def get_quiz_record(request):
     req = json.loads(request.body.decode())
@@ -192,173 +360,14 @@ def get_post_record(request):
     return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
 
 
-def upload(request):
-    fileObj = request.FILES.get('file')
-    user_id = request.POST.get('userId')
-    record_id = request.POST.get('recordId')
-    print(record_id)
-    upload_dir = os.path.join(BASE_DIR, 'upload', 'user_upload', 'user_%s' % user_id)
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
-    upload_path = os.path.join(upload_dir, fileObj.name)
-    # try:
-    #     with open(upload_path, mode='rb') as f:
-    #         pass
-    # except FileNotFoundError:
-    #     with open(upload_path, mode='wb') as f:
-    #         print("文件创建成功！")
+# 模拟批阅 #################################################################
 
-    f = open(upload_path, 'wb')
-    for chunk in fileObj.chunks():
-        f.write(chunk)
-        f.close()
-
-    # The reason for this error is that .get() returns an individual object and.update() only works on querysets, such as what would be returned with .filter() instead of .get().
-    ExerRecord.objects.filter(pk=record_id).update(uploadStatus=True, uploadTime=datetime.datetime.now(), uploadFilename=fileObj.name)
-    # print(type(record))
-    # record.save()
-
-    return JsonResponse({'msg': 'upload successfully!'})
-
-
-def create_post(request):
+def correct_quiz(request):
     req = json.loads(request.body.decode())
-    postUser = req["postUser"]
-    postTitle = req["postTitle"]
-    postTag = req["postTag"]
-    postContent = req["postContent"]
-    postTag = PostTag.objects.get(postTag=postTag)
-    postUser = User.objects.get(userName=postUser)
-    post = Post(
-        postTag=postTag, postTitle=postTitle,
-        postContent=postContent, postPerson=postUser
-    )
-    post.save()
-    return JsonResponse({"msg": "post create successfully!"})
+    record_id = req["record_id"]
+    quiz_score = req["quiz_score"]
+    correct_info = req["correct_info"]
 
+    ExerRecord.objects.filter(pk=record_id).update(quizScore=quiz_score, resultInfo=correct_info, correctTime=datetime.datetime.now(), correctStatus=True)
 
-# def get_tagNum(request):
-#     # 获取每类标签的帖子的数量
-#     TagNumList = []
-#     num = 0
-#     TagSet = PostTag.objects.all()
-#     for t in TagSet:  # 直接遍历QuerySet
-#         if t is None:
-#             num = 0  # 没有帖子的标签查询不到
-#         else:
-#             # Post模型中的postTag是外键,不是数据字符串
-#             num = len(Post.objects.filter(postTag=t))
-#             # print(num)
-#         TagNumList.append({"tagName": str(t), "tagNum": num})
-
-#     return JsonResponse(json.dumps(TagNumList), safe=False)
-
-
-def get_post_list(request):
-    # 获取每类标签的帖子的数量
-    tag_list = []
-    num = 0
-    TagSet = PostTag.objects.all()
-    for t in TagSet:  # 直接遍历QuerySet
-        if t is None:
-            num = 0  # 没有帖子的标签查询不到
-        else:
-            # Post模型中的postTag是外键,不是数据字符串
-            num = len(Post.objects.filter(postTag=t))
-            # print(num)
-        tag_list.append({"tagName": str(t), "tagNum": num})
-
-    # 获取post列表的相关信息
-    post_list = []
-    post = Post.objects.all()
-    for p in post:
-        post_list.append({
-            'post_id': p.id,
-            'poster': p.postPerson.userName,
-            'post_title': p.postTitle,
-            'post_tag': p.postTag.postTag,
-            'post_create_time': p.postCreateTime,
-            'post_modify_time': p.postModifyTime,
-            'reply_num': len(p.postReply.all()),
-            'view_num': p.postViewNum
-        })
-
-    mix_list = {
-        'tag_list': tag_list,
-        'post_list': post_list,
-    }
-
-    return JsonResponse(json.dumps(mix_list, cls=ComplexEncoder), safe=False)
-
-
-def create_post_reply(request):
-    req = json.loads(request.body.decode())
-    reply_from = req["reply_from"]
-    reply_to = req["reply_to"]
-    reply_content = req["reply_content"]
-    reply_post = req["reply_post"]
-    post_reply = PostReply.objects.create(
-        replyFrom=User.objects.get(pk=reply_from),
-        replyTo=User.objects.get(userName=reply_to),
-        replyContent=reply_content
-    )
-    Post.objects.get(pk=reply_post).postReply.add(post_reply)
-    # 写入post的活动时间
-    Post.objects.filter(pk=reply_post).update(postModifyTime=datetime.datetime.now())
-
-    return JsonResponse({"msg": "回复成功！"})
-
-
-def get_reply(request):
-    reply_list = []
-    req = json.loads(request.body.decode())
-    post_id = req["post_id"]  # 不能和模型字段名一样，会报错
-    msg = ""
-
-    post = Post.objects.get(pk=post_id)
-    postObj = {
-        'poster': post.postPerson.userName,
-        'post_title': post.postTitle,
-        'post_content': post.postContent,
-        'post_tag': post.postTag.postTag,
-        'post_create_time': post.postCreateTime,
-        'post_modify_time': post.postModifyTime,
-        'reply_num': len(post.postReply.all()),
-        'view_num': post.postViewNum,
-    }
-    reply_list.append(postObj)
-
-    try:
-        reply = post.postReply.all()
-    except reply.DoesNotExist:
-        msg = "该帖子尚无回复！"
-    else:
-        msg = "有回复"
-        for r in reply:
-            reply_list.append({
-                "reply_from": r.replyFrom.userName,
-                "reply_to": r.replyTo.userName,
-                "reply_content": r.replyContent,
-                "reply_time": r.replyTime,
-                "msg": msg
-            })
-
-    return JsonResponse(json.dumps(reply_list, cls=ComplexEncoder), safe=False)
-
-
-def create_reply_reply(request):
-    req = json.loads(request.body.decode())
-    reply_from = req["reply_from"]
-    reply_to = req["reply_to"]
-    reply_content = req["reply_content"]
-    reply_post = req["reply_post"]
-    post_reply = PostReply.objects.create(
-        replyFrom=User.objects.get(pk=reply_from),
-        replyTo=User.objects.get(userName=reply_to),
-        replyContent=reply_content
-    )
-    Post.objects.get(pk=reply_post).postReply.add(post_reply)
-    # 写入post的活动时间
-    Post.objects.filter(pk=reply_post).update(postModifyTime=datetime.datetime.now())
-
-    return JsonResponse({"msg": "回复成功！"})
+    return JsonResponse({"msg": "批阅成功！"})

@@ -86,7 +86,7 @@ class QuizBank(models.Model):
     )
     quizText = models.TextField(max_length=1000, verbose_name="试题文本")
     quizFullScore = models.IntegerField(verbose_name="满分",)
-    quizFilename = models.FileField(upload_to="%Y/%m/%d", verbose_name="文件名")
+    quizFilename = models.FileField(max_length=50, upload_to="%Y/%m/%d", verbose_name="文件名")
     quizDifficulty = models.CharField(
         max_length=1,
         choices=QUIZ_DIFFICULTY,

@@ -2,9 +2,12 @@
   <!-- 帖子标题内容板块 -->
   <div>
     <v-card class="elevation-1">
-      <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
-      <p class="overflow headline font-weight-bold px-3">{{postTitle}}</p>
-      <span class="grey--text font-weight-medium ml-3">{{postPerson}}</span>
+      <p class="overflow headline font-weight-bold px-3 pt-4">{{postTitle}}</p>
+      <div class="grey--text text--darken-2">
+        <span class="font-weight-medium ml-3">{{postTag}} ●</span>
+        <span class="font-weight-medium">{{postPerson}} ●</span>
+        <span class="font-weight-medium">发布时间: {{postCreateTime}}</span>
+      </div>
       <v-divider></v-divider>
       <div class="pl-3 pr-3">
         <v-layout row justify-center>
@@ -26,7 +29,6 @@
                 <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
                 <v-textarea
                   v-model="reply_content"
-                  :rules="[() => !!reply_content || '输入不能为空!']"
                   label="回复楼主"
                   auto-grow
                   required
@@ -54,8 +56,8 @@
         <v-layout row justify-center align-center>
           <v-flex md10 sm10>
             <div class="pl-5 pt-3">
-              <span class="grey--text font-weight-medium">{{item.reply_from}}</span>
-              <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{timeFormat(item.reply_time)}}</span>
+              <span class="grey--text text--darken-1 font-weight-medium">{{item.reply_from}}</span>
+              <span class="caption grey--text text--darken-1 font-weight-medium">&nbsp;&nbsp;{{timeFormat(item.reply_time)}}</span>
               <p class="overflow mt-2">
                 <span v-show="isShow(item.reply_to)" class="grey--text">@{{item.reply_to}}&nbsp;&nbsp;</span>
                 {{item.reply_content}}
@@ -74,7 +76,6 @@
                 <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
                 <v-textarea
                   v-model="reply_content"
-                  :rules="[() => !!reply_content || '输入不能为空!']"
                   :label= "reply_other"
                   auto-grow
                   flat
@@ -108,24 +109,14 @@
        postTitle: "",
        postTag: "",
        postContent: "",
-       postId: 5,
+       postId: 0,
+       postCreateTime: null,
+       postViewNum: null,
 
        /* rules: {
         *   required: (value) => !!value || 'Required',
         * }, */
        
-       breadcrumbs: [
-         {
-           text: 'Post',
-           disabled: false,
-           href: '/#/discuss'
-         },
-         {
-           text: '闲聊灌水',
-           disabled: false,
-           href: '/#/discuss'
-         }
-       ]
      }
    },
    methods: {
@@ -141,6 +132,8 @@
          this.postTag = res[0].post_tag
          this.postPerson = res[0].poster
          this.postContent = res[0].post_content
+         this.postCreateTime = res[0].post_create_time
+         this.postViewNum = res[0].view_num
 
          sessionStorage.setItem("post_id", this.$route.params.id)
          sessionStorage.setItem("post_person", this.postPerson)
@@ -174,19 +167,27 @@
            message: '输入不能为空！',
          });
        }else{
-         this.$axios.post("api/create_post_reply/", JSON.stringify({
-           "reply_content": this.reply_content,
-           "reply_from": this.$store.state.userid,
-           "reply_to": sessionStorage.getItem("post_person"),
-           "reply_post": sessionStorage.getItem("post_id")
-         })).then(res => {
+         if(!this.$store.state.islogin){
+           this.$message({
+             message: '登录后才能进行回复！',
+           });
            this.post_sheet = false
            this.reply_content = ""
-           console.log(res.data)
-           this.reload()
-         }).catch(err => {
-           console.log(err.data)
-         })
+         }else{
+           this.$axios.post("api/create_post_reply/", JSON.stringify({
+             "reply_content": this.reply_content,
+             "reply_from": this.$store.state.userid,
+             "reply_to": sessionStorage.getItem("post_person"),
+             "reply_post": sessionStorage.getItem("post_id")
+           })).then(res => {
+             this.post_sheet = false
+             this.reply_content = ""
+             console.log(res.data)
+             this.reload()
+           }).catch(err => {
+             console.log(err.data)
+           }) 
+         }
        }
      },
      create_reply_reply(reply_to, index){
@@ -195,19 +196,27 @@
            message: '输入不能为空！',
          });
        }else{
-         this.$axios.post("api/create_reply_reply/", JSON.stringify({
-           "reply_content": this.reply_content,
-           "reply_from": this.$store.state.userid,
-           "reply_to": reply_to,
-           "reply_post": sessionStorage.getItem("post_id")
-         })).then(res => {
-           this.replyList[index].reply_sheet = false
+         if(!this.$store.state.islogin){
+           this.$message({
+             message: '登录后才能进行回复！',
+           });
+           this.replyList[index].reply_sheet = false;
            this.reply_content = ""
-           console.log(res.data)
-           this.reload()
-         }).catch(err => {
-           console.log(err.data)
-         }) 
+         }else{
+           this.$axios.post("api/create_reply_reply/", JSON.stringify({
+             "reply_content": this.reply_content,
+             "reply_from": this.$store.state.userid,
+             "reply_to": reply_to,
+             "reply_post": sessionStorage.getItem("post_id")
+           })).then(res => {
+             this.replyList[index].reply_sheet = false
+             this.reply_content = ""
+             console.log(res.data)
+             this.reload()
+           }).catch(err => {
+             console.log(err.data)
+           })  
+         }
        }
      },
      cancle_post_sheet(){

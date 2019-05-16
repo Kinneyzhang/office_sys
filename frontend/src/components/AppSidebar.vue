@@ -9,13 +9,13 @@
     </v-card-title>
     <v-list>
       <v-list-tile>
-        <router-link to="/">
-          <v-icon>create</v-icon>&nbsp;创建新主题
+        <router-link to="/" tag="span" class="caption">
+          <v-icon small>create</v-icon>&nbsp;&nbsp;&nbsp;创建新主题
         </router-link>
       </v-list-tile>
       <v-list-tile>
-        <router-link to="/">
-          <v-icon>cloud_upload</v-icon>&nbsp;上传答案
+        <router-link to="/" tag="span" class="caption">
+          <v-icon small>cloud_upload</v-icon>&nbsp;&nbsp;&nbsp;上传答案
         </router-link>
       </v-list-tile>
     </v-list>

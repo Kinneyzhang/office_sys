@@ -51,8 +51,9 @@ class ExerRecordAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = (
-        'postTag', 'postTitle',
-        'postPerson', 'postCreateTime', 'postModifyTime'
+        'postTitle', 'postContent', 'postPerson',
+        'postTag', 'postViewNum', 
+        'postCreateTime', 'postModifyTime'
     )
 
 
