@@ -9,6 +9,8 @@ import UserInfo from '@/components/UserInfo'
 import UserDownload from '@/components/UserDownload'
 import UserExercise from '@/components/UserExercise'
 import UserPost from '@/components/UserPost'
+import PostTag from '@/components/PostTag'
+import PostList from '@/components/PostList'
 
 Vue.use(Router)
 
@@ -25,9 +27,19 @@ export default new Router({
 	    component: TheQuiz
 	},
 	{
-	    path: '/discuss',
-	    name: 'TheDiscuss',
+	    path: '/post',
+	    redirect: '/post/all',
 	    component: TheDiscuss,
+	    children: [
+		{
+		    path: 'all',
+		    component: PostList
+		},
+		{
+		    path: 'tag/:tagName',
+		    component: PostTag
+		},
+	    ]
 	},
 	{
 	    path: '/post/:id',

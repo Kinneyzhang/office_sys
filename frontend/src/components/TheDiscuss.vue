@@ -1,7 +1,7 @@
 <template>
   <v-card class="elevation-1">
     <v-container fluid>
-      <div class="pa-3 disscussInfo" style="background-color:#d1f0ff;" v-show="true">
+      <div class="pa-3 disscussInfo" style="background-color:#d1f0ff;" v-show="false">
         <v-icon class="cursor" @click="closeBox">close</v-icon>
         <p class="subheading">{{userName}}, 你好</p>
         <p>此为讨论交流板块。在这里你可以分享自己的观点，提出做题过程中的疑惑，积极讨论和office操作题及相关话题。</p>
@@ -23,7 +23,9 @@
                 :key="index"
                 @click=""
               >
-                <v-list-tile-title>{{ item.tagName }} x {{ item.tagNum }}</v-list-tile-title>
+                <router-link :to="tagLink(item.tagName)" @click="taglink">
+                  {{ item.tagName }} x {{ item.tagNum }}
+                </router-link>
               </v-list-tile>
             </v-list>
           </v-menu>
@@ -70,20 +72,15 @@
         </v-flex>
       </v-layout>
       <v-layout>
-        <post-list></post-list>
+        <router-view></router-view>
       </v-layout>
     </v-container>
   </v-card>
 </template>
 
-
 <script>
- import PostList from './PostList.vue'
  export default {
    inject: ['reload'],
-   components: {
-     PostList,
-   },
    data () {
      return {
        tagList: [],
@@ -95,6 +92,11 @@
      }
    },
    computed: {
+     tagLink(){
+       return function(tagName){
+         return "/post/tag/" + tagName
+       }
+     },
      computedTag(){
        var tag = this.tagList.map(v => v.tagName);
        return tag;
@@ -104,6 +106,9 @@
      }
    },
    methods: {
+     taglink(){
+       this.reload()
+     },
      create_post(){
        this.$axios.post("api/create_post/", JSON.stringify({
          "postTitle": this.postTitle,

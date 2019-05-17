@@ -13,6 +13,7 @@ urlpatterns = [
     path('upload/', views.upload),
     path('create_post/', views.create_post),
     path('get_post_list/', views.get_post_list),
+    path('get_tag_post/', views.get_tag_post),
     path('get_tag_list/', views.get_tag_list),
     path('get_reply/', views.get_reply),
     path('create_post_reply/', views.create_post_reply),

@@ -8,6 +8,8 @@ from backend.models import QuizBank, QuizType, KnowledgePoint
 from backend.models import ExerRecord
 from backend.models import Post, PostReply, PostTag
 
+import time
+import datetime
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('userName', 'userPasswd', 'registerTime')
@@ -26,18 +28,33 @@ class KnowledgePointAdmin(admin.ModelAdmin):
 
 class QuizBankAdmin(admin.ModelAdmin):
     list_display = (
+        'quizId', 'quizText', 'quizFullScore', 'quizInputer',
+        'quizCreateTime', 'quizModifyTime'
+    )
+    fields = (
+        'quizInputer','quizType',
+        'quizText',
+        'quizFullScore', 'quizDifficulty', 'quizPointNum',
+        'quizKnowledgePoint', 'quizFilename',
+    )
+    list_filter = (
         'quizType', 'quizInputer',
-        'quizText', 'quizFullScore',
-        'quizFilename', 'quizCreateTime',
-        'quizModifyTime'
+        'quizCreateTime', 'quizModifyTime'
     )
 
-    # def save_model(self, request, obj, form, change):
-    #     quiztype = obj.quizType
-    #     difficulty = obj.quizDifficulty
-    #     quiz_id = '%sD%s0001' % (quiztype, difficulty)
-    #     obj.objects.all().update(quizId=quiz_id)
-    #     super().save_model(request, obj, form, change)
+    def save_model(self, request, obj, form, change):
+        dbid = QuizBank.objects.last().id + 1
+        quizid = str(obj.quizType)[0:1]
+        if obj.quizPointNum == '单一':
+            quizid += 's'
+        else:
+            quizid += 'c'
+            # str += datetime.datetime.now().strftime('y%m%d%')
+        quizid += obj.quizDifficulty
+        quizid += '%04d' % dbid
+        obj.quizId = quizid
+        
+        super().save_model(request, obj, form, change)
 
 
 class ExerRecordAdmin(admin.ModelAdmin):

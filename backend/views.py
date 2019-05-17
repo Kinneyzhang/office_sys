@@ -154,13 +154,13 @@ def upload(request):
     upload_dir = os.path.join(BASE_DIR, 'upload', 'user_upload', 'user_%s' % user_id)
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
-    upload_path = os.path.join(upload_dir, fileObj.name)
-    # try:
-    #     with open(upload_path, mode='rb') as f:
-    #         pass
-    # except FileNotFoundError:
-    #     with open(upload_path, mode='wb') as f:
-    #         print("文件创建成功！")
+        upload_path = os.path.join(upload_dir, fileObj.name)
+        # try:
+        #     with open(upload_path, mode='rb') as f:
+        #         pass
+        # except FileNotFoundError:
+        #     with open(upload_path, mode='wb') as f:
+        #         print("文件创建成功！")
 
     f = open(upload_path, 'wb')
     for chunk in fileObj.chunks():
@@ -199,11 +199,12 @@ def get_tag_list(request):
     num = 0
     TagSet = PostTag.objects.all()
     for t in TagSet:  # 直接遍历QuerySet
-        if t is None:
-            num = 0  # 没有帖子的标签查询不到
-        else:
-            # Post模型中的postTag是外键,不是数据字符串
-            num = len(Post.objects.filter(postTag=t))
+        # Post模型中的postTag是外键,不是数据字符串
+        try:
+            p = Post.objects.filter(postTag=t)
+            num = len(p)
+        except p.DoesNotExist: # 没有该tag的帖子
+            num = 0
             # print(num)
         tag_list.append({"tagName": str(t), "tagNum": num})
 
@@ -229,7 +230,28 @@ def get_post_list(request):
     return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)
 
 
-# 帖子回复 ###############################################################
+def get_tag_post(request):
+    # 获取每一类的帖子对象
+    req = json.loads(request.body.decode())
+    tag_name = req["tag_name"]
+    post_list = []
+    post = Post.objects.filter(postTag=PostTag.objects.get(postTag=tag_name))
+    for p in post:
+        post_list.append({
+            'post_id': p.id,
+            'poster': p.postPerson.userName,
+            'post_title': p.postTitle,
+            'post_tag': p.postTag.postTag,
+            'post_create_time': p.postCreateTime,
+            'post_modify_time': p.postModifyTime,
+            'reply_num': len(p.postReply.all()),
+            'view_num': p.postViewNum
+        })
+
+    return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)
+
+
+# 帖子回复 ###########################################################
 
 def get_reply(request):
     reply_list = []

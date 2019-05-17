@@ -69,7 +69,7 @@ class QuizBank(models.Model):
         ('2', '2'),
         ('3', '3'),
     )
-    quizId = models.CharField(max_length=20)
+    quizId = models.CharField(max_length=20, verbose_name="试题编号")
     quizType = models.ForeignKey(
         QuizType,
         on_delete=models.CASCADE,

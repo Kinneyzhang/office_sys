@@ -1,4 +1,5 @@
 <template>
+  <!-- <post-list :data="postList"></post-list> -->
   <el-table
     :data="postList"
     style="width: 100%">
@@ -60,8 +61,8 @@
 
 <script>
  export default {
-   data(){
-     return {
+   data() {
+     return{
        postList: []
      }
    },
@@ -107,8 +108,10 @@
      },
    },
    methods: {
-     get_all_post(){
-       this.$axios.get("api/get_post_list/").then(res => {
+     get_tag_post(){
+       this.$axios.post("api/get_tag_post/", JSON.stringify({
+         "tag_name": this.$route.params.tagName,
+       })).then(res => {
          console.log(res.data)
          res = JSON.parse(res.data)
          
@@ -141,7 +144,7 @@
      },
    },
    created(){
-     this.get_all_post()
+     this.get_tag_post()
    }
  }
 </script>

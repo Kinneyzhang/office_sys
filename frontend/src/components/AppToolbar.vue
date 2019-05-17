@@ -20,7 +20,7 @@
       <router-link to="/quiz">
         <v-btn flat class="subheading font-weight-bold">题库</v-btn>
       </router-link>
-      <router-link to="/discuss">
+      <router-link to="/post">
         <v-btn flat class="subheading font-weight-bold">讨论</v-btn>
       </router-link>
       <router-link to="/learn">
