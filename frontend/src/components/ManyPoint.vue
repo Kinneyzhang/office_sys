@@ -13,6 +13,7 @@
       label="知识点"
       min-width="30%"
       prop="knowledge_point"
+      align="center"
     ></el-table-column>
     <el-table-column
       label="题目预览"
@@ -103,7 +104,7 @@
        }else{
          this.$axios.post("api/download/", JSON.stringify({
            "quiz_id": quizId,
-           "user_id": this.userid,
+           "user_id": this.$store.state.userid,
          }),{
            responseType: 'blob'
          }).then(res => {

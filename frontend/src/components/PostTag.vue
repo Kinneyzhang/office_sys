@@ -8,33 +8,46 @@
       label="主题"
       min-width="70%">
       <template slot-scope="scope">
-        <router-link
-          tag="span"
-          :to="link(scope.row.id)"
-          class="pointer subheading font-weight-medium"
-          v-html="scope.row.title"
-        ></router-link>
-        <br>
-        <router-link
-          :to="tagLink(scope.row.tag)"
-          tag="span"
-          class="font-weight-bold pointer grey--text grey lighten-3"
-          style="font-size:13px;"
-        >{{scope.row.tag}}</router-link>
-        <span v-html="scope.row.divider" class="grey--text caption"></span>
-        <router-link
-          to = "/discuss"
-          tag="span"
-          class="font-weight-bold pointer"
-          style="font-size:13px;"
-        >{{scope.row.poster}}</router-link>
-        <span v-html="scope.row.divider" class="grey--text caption"></span>
-        <router-link
-          to = "/discuss"
-          tag="span"
-          class="font-weight-bold grey--text"
-          style="font-size:10px;"
-        >创建于&nbsp;{{timeFormat(scope.row.create)}}</router-link>
+        <div v-if="scope.row.sticky">
+          <router-link
+            tag="span"
+            :to="link(scope.row.id)"
+            class="pointer subheading font-weight-bold"
+          >
+            <v-icon outline>label_important</v-icon>
+            {{scope.row.title}}
+          </router-link><br>
+          <p class="mt-2">{{scope.row.content}}</p>
+        </div>
+        <div v-else>
+          <router-link
+            tag="span"
+            :to="link(scope.row.id)"
+            class="pointer subheading font-weight-medium"
+            v-html="scope.row.title"
+          ></router-link>
+          <br>
+          <router-link
+            :to="tagLink(scope.row.tag)"
+            tag="span"
+            class="font-weight-bold pointer"
+            style="font-size:12px;"
+          >{{scope.row.tag}}</router-link>
+          <span v-html="scope.row.divider" class="grey--text caption"></span>
+          <router-link
+            to = "/discuss"
+            tag="span"
+            class="font-weight-bold pointer"
+            style="font-size:12px;"
+          >{{scope.row.poster}}</router-link>
+          <span v-html="scope.row.divider" class="grey--text caption"></span>
+          <router-link
+            to = "/discuss"
+            tag="span"
+            class="font-weight-bold grey--text"
+            style="font-size:10px;"
+          >创建于&nbsp;{{timeFormat(scope.row.create)}}</router-link>
+        </div>
       </template>
     </el-table-column>
     <el-table-column
@@ -126,20 +139,39 @@
          var viewNum = res.map(v => v.view_num)
          var modifyTime = res.map(v => v.post_modify_time)
          var createTime = res.map(v => v.post_create_time)
+         var stickyPost = res.map(v => v.sticky_post)
+         var temp = []
          
          for(var i=0; i<postPerson.length; i++){
-           this.postList.unshift({
-             id: postId[i],
-             poster: postPerson[i],
-             title: postTitle[i],
-             tag: postTag[i],
-             reply: replyNum[i],
-             view: viewNum[i],
-             active: modifyTime[i],
-             create: createTime[i],
-             divider: "&nbsp;●&nbsp;"
-           })
+           if(stickyPost[i] == false){
+             this.postList.unshift({
+               id: postId[i],
+               poster: postPerson[i],
+               title: postTitle[i],
+               content: postContent[i],
+               tag: postTag[i],
+               reply: replyNum[i],
+               view: viewNum[i],
+               active: modifyTime[i],
+               create: createTime[i],
+               divider: "&nbsp;●&nbsp;",
+               sticky: stickyPost[i]
+             })
+           }else{
+             temp.unshift({
+               id: postId[i],
+               title: postTitle[i],
+               content: postContent[i],
+               reply: replyNum[i],
+               view: viewNum[i],
+               active: modifyTime[i],
+               create: createTime[i],
+               divider: "&nbsp;●&nbsp;",
+               sticky: stickyPost[i]
+             })
+           }
          }
+         this.postList.unshift.apply(this.postList, temp)
        }).catch(err => {
          console.log(err.data)
        })

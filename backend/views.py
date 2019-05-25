@@ -184,7 +184,7 @@ def get_point_quiz(request):
     knowledge_point = req["knowledge_point"]
     quiz = None
     try:
-        quiz = QuizBank.objects.filter(quizType=QuizType.objects.get(quizTypeName=quiz_type)).filter(quizPointNum='one').filter(quizKnowledgePoint__knowledgePoint=knowledge_point)
+        quiz = QuizBank.objects.filter(quizType__quizTypeName=quiz_type).filter(quizPointNum='only').filter(quizKnowledgePoint__knowledgePoint__contains=knowledge_point)
     except QuizBank.DoesNotExist:
         return JsonResponse({"msg": "没有%s试题" % quiz_type})
     else:
@@ -334,7 +334,8 @@ def get_post_list(request):
             'post_create_time': p.postCreateTime,
             'post_modify_time': p.postModifyTime,
             'reply_num': len(p.postReply.all()),
-            'view_num': p.postViewNum
+            'view_num': p.postViewNum,
+            'sticky_post': p.stickyPost
         })
 
     return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)
@@ -351,11 +352,13 @@ def get_tag_post(request):
             'post_id': p.id,
             'poster': p.postPerson.userName,
             'post_title': p.postTitle,
+            'post_content': p.postContent,
             'post_tag': p.postTag.postTag,
             'post_create_time': p.postCreateTime,
             'post_modify_time': p.postModifyTime,
             'reply_num': len(p.postReply.all()),
-            'view_num': p.postViewNum
+            'view_num': p.postViewNum,
+            'sticky_post': p.stickyPost
         })
 
     return JsonResponse(json.dumps(post_list, cls=ComplexEncoder), safe=False)

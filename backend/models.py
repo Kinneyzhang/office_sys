@@ -210,6 +210,7 @@ class Post(models.Model):
     postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
     postModifyTime = models.DateTimeField(default=timezone.now, verbose_name="修改时间")
     postViewNum = models.IntegerField(default=0, verbose_name="浏览量")
+    stickyPost = models.BooleanField(default=False, verbose_name="是否置顶")
 
     class Meta:
         db_table = 'forum_post'

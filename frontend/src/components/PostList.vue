@@ -7,6 +7,16 @@
       min-width="70%">
       <template slot-scope="scope">
         <router-link
+          v-if="scope.row.sticky"
+          tag="span"
+          :to="link(scope.row.id)"
+          class="pointer subheading font-weight-medium"
+        >
+          <v-icon small outline>label_important</v-icon>
+          {{scope.row.title}}
+        </router-link>
+        <router-link
+          v-else
           tag="span"
           :to="link(scope.row.id)"
           class="pointer subheading font-weight-medium"
@@ -16,15 +26,15 @@
         <router-link
           :to="tagLink(scope.row.tag)"
           tag="span"
-          class="font-weight-bold pointer grey--text grey lighten-3"
-          style="font-size:13px;"
+          class="font-weight-bold pointer"
+          style="font-size:12px;"
         >{{scope.row.tag}}</router-link>
         <span v-html="scope.row.divider" class="grey--text caption"></span>
         <router-link
           to = "/discuss"
           tag="span"
           class="font-weight-bold pointer"
-          style="font-size:13px;"
+          style="font-size:12px;"
         >{{scope.row.poster}}</router-link>
         <span v-html="scope.row.divider" class="grey--text caption"></span>
         <router-link
@@ -121,6 +131,7 @@
          var viewNum = res.map(v => v.view_num)
          var modifyTime = res.map(v => v.post_modify_time)
          var createTime = res.map(v => v.post_create_time)
+         var stickyPost = res.map(v => v.sticky_post)
          
          for(var i=0; i<postPerson.length; i++){
            this.postList.unshift({
@@ -132,7 +143,8 @@
              view: viewNum[i],
              active: modifyTime[i],
              create: createTime[i],
-             divider: "&nbsp;●&nbsp;"
+             divider: "&nbsp;●&nbsp;",
+             sticky: stickyPost[i]
            })
          }
        }).catch(err => {

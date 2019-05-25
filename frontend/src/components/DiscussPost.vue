@@ -37,8 +37,8 @@
                   placeholder="输入回复的内容"
                   rows=6>
                 </v-textarea>
-                <v-btn small color="primary" @click="create_post_reply" class="font-weight-bold">回复</v-btn>
-                <v-btn small color="primary" @click="cancle_post_sheet" class="font-weight-bold">取消</v-btn>
+                <v-btn small flat color="primary" @click="create_post_reply" class="body-2 btn-style">回复</v-btn>
+                <v-btn small flat color="primary" @click="cancle_post_sheet" class="body-2 btn-style">取消</v-btn>
               </v-list>
             </v-bottom-sheet>
           </v-flex>
@@ -83,8 +83,8 @@
                   placeholder="输入回复的内容"
                   rows=6>
                 </v-textarea>
-                <v-btn small color="primary" @click="create_reply_reply(item.reply_from, index)" class="font-weight-bold">回复</v-btn>
-                <v-btn small color="primary" @click="cancle_reply_sheet(index)" class="font-weight-bold">取消</v-btn>
+                <v-btn small flat color="primary" @click="create_reply_reply(item.reply_from, index)" class="body-2 btn-style">回复</v-btn>
+                <v-btn small flat color="primary" @click="cancle_reply_sheet(index)" class="body-2 btn-style">取消</v-btn>
               </v-list>
             </v-bottom-sheet>
           </v-flex>

@@ -1,7 +1,7 @@
 <template>
   <div style="width:100%">
     <div class="py-4">
-      <span class="font-weight-medium title"><v-icon>subtitles</v-icon>&nbsp;{{quizType}}&nbsp;操作题</span><hr>
+      <span @click="typeLink(quizType)" class="pointer font-weight-medium title"><v-icon>subtitles</v-icon>&nbsp;{{quizType}}&nbsp;操作题</span><hr>
       <span class="ml-2 body-2 font-weight-bold">知识点专项</span>
       <v-btn class="ma-2 font-weight-bold" small round flat color="primary" v-for="(item, index) in knowledgelist" :key="index" @click="pointLink(item)">
         {{item}}
@@ -21,6 +21,9 @@
      }
    },
    methods: {
+     typeLink(type){
+       this.$router.push({path:'/quiz/' + type})
+     },
      get_knowledge_point(){
        this.$axios.post("api/get_knowledge_point/", JSON.stringify({
          "quiz_type": this.quizType,

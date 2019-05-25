@@ -13,6 +13,7 @@
       label="知识点"
       min-width="30%"
       prop="knowledge_point"
+      align="center"
     ></el-table-column>
     <el-table-column
       label="题目预览"
@@ -65,6 +66,8 @@
          "quiz_type": this.$route.params.quizType,
          "knowledge_point": this.$route.params.point,
        })).then(res => {
+         /* console.log(this.$route.params.quizType)
+          * console.log(this.$route.params.point) */
          this.quizlist = []
          console.log(res.data)
          res = JSON.parse(res.data)
@@ -103,7 +106,7 @@
        }else{
          this.$axios.post("api/download/", JSON.stringify({
            "quiz_id": quizId,
-           "user_id": this.userid,
+           "user_id": this.$store.state.userid,
          }),{
            responseType: 'blob'
          }).then(res => {
@@ -123,6 +126,9 @@
    },
    created(){
      this.get_point_quiz()
+   },
+   watch: {
+     '$route': 'get_point_quiz',
    }
  }
 </script>

@@ -12,6 +12,7 @@
     <el-table-column
       label="知识点"
       min-width="30%"
+      align="center"
       prop="knowledge_point"
     ></el-table-column>
     <el-table-column

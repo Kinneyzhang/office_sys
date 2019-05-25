@@ -2,10 +2,10 @@
   <v-card class="elevation-1">
     <v-container fluid>
       <v-layout row>
-        <v-flex sm1 md1>
+        <v-flex sm3 md1>
           <v-menu offset-y z-index="1">
             <template v-slot:activator="{ on }">
-              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">试题分类<v-icon small>keyboard_arrow_down</v-icon></v-btn>
+              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">试题分类<v-icon small>arrow_drop_down</v-icon></v-btn>
             </template>
             <v-list dense>
               <v-list-tile
@@ -18,7 +18,7 @@
             </v-list>
           </v-menu>
         </v-flex>
-        <v-flex sm1 md1 offset-md1>
+        <v-flex sm3 md1 offset-md1 offset-sm1>
           <div>
             <v-btn small flat color="primary" class="btn-style body-2" @click="latestQuiz">最新发布</v-btn>
           </div>

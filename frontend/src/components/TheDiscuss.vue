@@ -15,7 +15,7 @@
         <v-flex xs1 sm3 md1>
           <v-menu offset-y z-index="1">
             <template v-slot:activator="{ on }">
-              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">主题分类<v-icon small>keyboard_arrow_down</v-icon></v-btn>
+              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">主题分类<v-icon small>arrow_drop_down</v-icon></v-btn>
             </template>
             <v-list dense>
               <v-list-tile

@@ -32,7 +32,7 @@ class QuizBankAdmin(admin.ModelAdmin):
         'quizCreateTime', 'quizModifyTime'
     )
     fields = (
-        'quizInputer','quizType',
+        'quizId', 'quizInputer','quizType',
         'quizText',
         'quizFullScore', 'quizDifficulty', 'quizPointNum',
         'quizKnowledgePoint', 'quizFilename',
@@ -43,19 +43,22 @@ class QuizBankAdmin(admin.ModelAdmin):
     )
 
     def save_model(self, request, obj, form, change):
-        dbid = QuizBank.objects.last().id + 1
-        quizid = str(obj.quizType)[0:1]
-        if obj.quizPointNum == '单一':
+        quizid = ""
+        
+        quizid += str(obj.quizType)[0:1]
+        quizid += obj.quizDifficulty
+        if obj.quizPointNum == 'only':
             quizid += 's'
         else:
             quizid += 'c'
-            # str += datetime.datetime.now().strftime('y%m%d%')
-        quizid += obj.quizDifficulty
-        quizid += '%04d' % dbid
-        obj.quizId = quizid
+            
+        if obj.quizId.isdigit():
+            quizid += '%04d' % int(obj.quizId)
+        else:
+            quizid += str(obj.quizId)[3:]
         
+        obj.quizId = quizid
         super().save_model(request, obj, form, change)
-
 
 class ExerRecordAdmin(admin.ModelAdmin):
     list_display = (
@@ -76,6 +79,10 @@ class PostAdmin(admin.ModelAdmin):
         'postTitle', 'postContent', 'postPerson',
         'postTag', 'postViewNum', 
         'postCreateTime', 'postModifyTime'
+    )
+    fields = (
+        'postTitle', 'postContent', 'postPerson',
+        'postTag', 'stickyPost'
     )
 
 
