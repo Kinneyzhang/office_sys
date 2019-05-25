@@ -1,3 +1,4 @@
+
 <template>
   <!-- <post-list :data="postList"></post-list> -->
   <el-table
@@ -112,6 +113,7 @@
        this.$axios.post("api/get_tag_post/", JSON.stringify({
          "tag_name": this.$route.params.tagName,
        })).then(res => {
+         this.postList = []
          console.log(res.data)
          res = JSON.parse(res.data)
          
@@ -145,6 +147,9 @@
    },
    created(){
      this.get_tag_post()
+   },
+   watch:{
+     '$route': 'get_tag_post'
    }
  }
 </script>

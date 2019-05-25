@@ -12,32 +12,33 @@
         <p>关于提问的艺术，请参考：https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/master/README-zh_CN.md</p>
       </div>
       <v-layout row>
-        <v-flex xs1 sm1>
-          <v-menu offset-y z-index="2">
+        <v-flex xs1 sm3 md1>
+          <v-menu offset-y z-index="1">
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" dark v-on="on" class="font-weight-bold">所有分类</v-btn>
+              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">主题分类<v-icon small>keyboard_arrow_down</v-icon></v-btn>
             </template>
             <v-list dense>
               <v-list-tile
                 v-for="(item, index) in tagList"
                 :key="index"
-                @click=""
+                @click="tagLink(item.tagName)"
               >
-                <router-link :to="tagLink(item.tagName)" @click="taglink">
-                  {{ item.tagName }} x {{ item.tagNum }}
-                </router-link>
+                <span> {{ item.tagName }} x {{ item.tagNum }}</span>
               </v-list-tile>
             </v-list>
           </v-menu>
         </v-flex>
-        <v-flex xs1 sm1 md1 offset-xs9>
+        <v-flex sm3 md1 offset-sm1>
+          <v-btn flat small color="primary" class="btn-style body-2" @click="latestPost">最近活动</v-btn>
+        </v-flex>
+        <v-flex xs1 sm3 md1 offset-sm1>
           <div class="text-xs-center">
             <v-bottom-sheet v-model="sheet" inset>
               <template v-slot:activator>
-                <v-btn color="purple" dark><v-icon>add</v-icon>创建主题</v-btn>
+                <v-btn small flat color="purple" class="btn-style body-2"><v-icon>add</v-icon>创建主题</v-btn>
               </template>
-              <v-list class="pa-2">
-                <div class="mb-2"><v-icon>reply</v-icon>&nbsp;&nbsp;创建新的主题</div><br>
+              <v-list class="px-3">
+                <div class="mt-2 font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;创建新的主题</div><br>
                 <v-textarea
                   v-model="postTitle"
                   label="主题标题"
@@ -64,8 +65,8 @@
                   rows=6>
                 </v-textarea>
                 <div id="editor"></div>
-                <v-btn small @click="create_post" class="font-weight-bold">创建主题</v-btn>
-                <v-btn small @click="cancle" class="font-weight-bold">取消</v-btn>
+                <v-btn small flat color="primary" @click="create_post" class="btn-style body-2">创建主题</v-btn>
+                <v-btn small flat color="primary" @click="cancle" class="btn-style body-2">取消</v-btn>
               </v-list>
             </v-bottom-sheet>
           </div>
@@ -92,11 +93,6 @@
      }
    },
    computed: {
-     tagLink(){
-       return function(tagName){
-         return "/post/tag/" + tagName
-       }
-     },
      computedTag(){
        var tag = this.tagList.map(v => v.tagName);
        return tag;
@@ -106,25 +102,41 @@
      }
    },
    methods: {
-     taglink(){
-       this.reload()
+     latestPost(){
+       this.$router.push({path: '/post/latest'})
+     },
+     tagLink(tag){
+       this.$router.push({name:'tagList', params: {tagName: tag}});
      },
      create_post(){
-       this.$axios.post("api/create_post/", JSON.stringify({
-         "postTitle": this.postTitle,
-         "postTag": this.postTag,
-         "postContent": this.postContent,
-         "postUser": this.$store.state.username
-       })).then( res => {
-         console.log(res.data)
-         this.sheet = false;
-         this.reload()
-       }).catch( err => {
-         console.log(err.data)
-       })
+       if(!this.$store.state.username){
+         this.$message({
+           message: '请登录后再发帖！',
+         })
+       }else if(!this.postTitle || !this.postTag || !this.postContent){
+         this.$message({
+           message: '输入不能为空！',
+         })
+       }else{
+         this.$axios.post("api/create_post/", JSON.stringify({
+           "postTitle": this.postTitle,
+           "postTag": this.postTag,
+           "postContent": this.postContent,
+           "postUser": this.$store.state.username
+         })).then( res => {
+           console.log(res.data)
+           this.sheet = false;
+           this.reload()
+         }).catch( err => {
+           console.log(err.data)
+         }) 
+       }
      },
      cancle(){
        this.sheet = false;
+       this.postTitle = "";
+       this.postTag = "";
+       this.postContent = "";
      },
      closeBox(){
        this.isShow = false;

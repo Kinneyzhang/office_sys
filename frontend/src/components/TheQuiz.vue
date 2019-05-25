@@ -1,57 +1,33 @@
 <template>
   <v-card class="elevation-1">
-    <el-table
-      :data="quizlist"
-      style="width:100%"
-    >
-      <el-table-column
-        label="编号"
-        prop="quiz_id"
-        min-width="10%"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        label="知识点"
-        min-width="30%"
-        prop="knowledge_point"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        label="题目预览"
-        min-width="30%"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <v-menu bottom offset-y z-index="10">
+    <v-container fluid>
+      <v-layout row>
+        <v-flex sm1 md1>
+          <v-menu offset-y z-index="1">
             <template v-slot:activator="{ on }">
-              <v-btn small flat v-on="on" class="blue--text">点击预览</v-btn>
+              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">试题分类<v-icon small>keyboard_arrow_down</v-icon></v-btn>
             </template>
-            <div class="quiz_text pa-3" v-html="scope.row.quiz_text"></div>
+            <v-list dense>
+              <v-list-tile
+                v-for="(item, index) in typeList"
+                :key="index"
+                @click="typeLink(item)"
+              >
+                <span>{{item}}练习</span>
+              </v-list-tile>
+            </v-list>
           </v-menu>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="已练习"
-        prop="upload_num"
-        min-width="10%"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        label="正确率"
-        prop="accuracy"
-        min-width="10%"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        label="下载"
-        min-width="10%"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <v-icon class="pointer" @click="download(scope.row.quiz_id)">{{scope.row.icon}}</v-icon>
-        </template>
-      </el-table-column>
-    </el-table>
+        </v-flex>
+        <v-flex sm1 md1 offset-md1>
+          <div>
+            <v-btn small flat color="primary" class="btn-style body-2" @click="latestQuiz">最新发布</v-btn>
+          </div>
+        </v-flex>
+      </v-layout>
+      <v-layout>
+        <router-view></router-view>
+      </v-layout>
+    </v-container>
   </v-card>
 </template>
 
@@ -59,85 +35,27 @@
  export default {
    data () {
      return {
-       search: '',
-       pagination: {},
-       selected: [],
-       quizlist: []
+       typeList: [],
      }
    },
    methods: {
-     get_quiz(){
-       this.$axios.get("api/get_quiz/").then(res => {
+     typeLink(type){
+       this.$router.push({path:'/quiz/' + type})
+     },
+     latestQuiz(){
+       this.$router.push({path:'/quiz/'})
+     },
+     get_type_list(){
+       this.$axios.get("api/get_type_list/").then(res => {
          console.log(res.data)
-         res = JSON.parse(res.data)
-         var quizId = res.map(v => v.quizId)
-         var quizText = res.map(v => v.quizText)
-         var uploadNum = res.map(v => v.uploadNum)
-         var accuracy = res.map(v => v.accuracy)
-         var knowledgePoint = res.map(v => v.knowledgePoint)
-
-         var knowledge_point = []
-         var quizStr = []
-         for(var i=0; i<quizId.length; i++){
-           quizStr.push(quizText[i].split('；').join('；<br>'))
-           /* console.log(quizStr[i]) */
-         }
-         for(var i=0; i<quizId.length; i++){
-           knowledge_point.push(knowledgePoint[i].map(v => v.knowledgePoint))
-           this.quizlist.push({
-             quiz_id: quizId[i],
-             quiz_text: quizStr[i],
-             upload_num: uploadNum[i],
-             accuracy: accuracy[i]*100 + '%',
-             knowledge_point: knowledge_point[i].join('  '),
-             icon: 'get_app'
-           })
-         }
-         /* console.log(res.data) */
+         this.typeList = JSON.parse(res.data)
        }).catch(err => {
-         console.log(err)
+         console.log(err.data)
        })
      },
-     download(quizId){
-       if(!this.$store.state.islogin){
-         this.$message({
-           message: '登录后才能下载试题！',
-         });
-       }else{
-         this.$axios.post("api/download/", JSON.stringify({
-           "quiz_id": quizId,
-           "user_id": this.userid,
-         }),{
-           responseType: 'blob'
-         }).then(res => {
-           var blob = res.data
-           let url = window.URL.createObjectURL(blob)
-           let link = document.createElement('a')
-           link.style.display = 'none'
-           link.href = url
-           link.setAttribute('download', quizId+'.zip')
-           document.body.appendChild(link)
-           link.click()
-         }).catch(err => {
-           console.log(err)
-         }) 
-       }
-     }
    },
    created(){
-     this.get_quiz()
-   },
-   computed: {
-     userid(){
-       return this.$store.state.userid
-     }
-   },
+     this.get_type_list()
+   }
  }
 </script>
-
-<style>
- .quiz_text{
-   width: 400px;
-   background-color: white;
- }
-</style>

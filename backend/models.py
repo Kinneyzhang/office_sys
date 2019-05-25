@@ -13,8 +13,8 @@ class User(models.Model):
 
     class Meta:
         db_table = 'user_info'
-        verbose_name = '用户信息'
-        verbose_name_plural = '3. 用户信息'
+        verbose_name = '用户管理'
+        verbose_name_plural = '1-0. 用户管理'
 
     def __str__(self):
         return self.userName
@@ -30,8 +30,8 @@ class QuizType(models.Model):
 
     class Meta:
         db_table = 'quiz_type'
-        verbose_name = '试题分类'
-        verbose_name_plural = '4. 试题分类'
+        verbose_name = '题型管理'
+        verbose_name_plural = '2-2. 题型管理'
 
     def __str__(self):
         return u'%s' % (self.quizTypeName)
@@ -52,8 +52,8 @@ class KnowledgePoint(models.Model):
 
     class Meta:
         db_table = 'knowledge_point'
-        verbose_name = '知识点'
-        verbose_name_plural = '5. 知识点'
+        verbose_name = '知识点管理'
+        verbose_name_plural = '2-1. 知识点管理'
 
     def __str__(self):
         return u'%s/%s' % (self.quizType, self.knowledgePoint)
@@ -105,13 +105,27 @@ class QuizBank(models.Model):
 
     class Meta:
         db_table = 'quiz_bank'
-        verbose_name = '题库'
-        verbose_name_plural = '1. 题库'
+        verbose_name = '题库管理'
+        verbose_name_plural = '2-0. 题库管理'
 
     def __str__(self):
         return self.quizId
 
 
+# class DownloadRecord(models.Model):
+#     user = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         verbose_name="用户"
+#     )
+#     quiz = models.ForeignKey(
+#         QuizBank,
+#         on_delete=models.CASCADE,
+#         verbose_name="试题"
+#     )
+#     downloadTime = models.DateTimeField(auto_now_add=True, verbose_name="下载时间")
+
+    
 class ExerRecord(models.Model):
     user = models.ForeignKey(
         User,
@@ -135,8 +149,8 @@ class ExerRecord(models.Model):
 
     class Meta:
         db_table = 'exer_record'
-        verbose_name = '练习记录'
-        verbose_name_plural = '2. 练习记录'
+        verbose_name = '练习管理'
+        verbose_name_plural = '3-0. 练习管理'
 
 
 class PostTag(models.Model):
@@ -146,8 +160,8 @@ class PostTag(models.Model):
 
     class Meta:
         db_table = 'post_tag'
-        verbose_name = '帖子标签'
-        verbose_name_plural = '8. 帖子标签'
+        verbose_name = '标签管理'
+        verbose_name_plural = '4-2. 标签管理'
 
     def __str__(self):
         return self.postTag
@@ -171,8 +185,8 @@ class PostReply(models.Model):
 
     class Meta:
         db_table = 'post_reply'
-        verbose_name = '帖子回复'
-        verbose_name_plural = '7. 帖子回复'
+        verbose_name = '回复管理'
+        verbose_name_plural = '4-1. 回复管理'
 
 
 class Post(models.Model):
@@ -199,5 +213,5 @@ class Post(models.Model):
 
     class Meta:
         db_table = 'forum_post'
-        verbose_name = '讨论帖子'
-        verbose_name_plural = '6. 讨论帖子'
+        verbose_name = '帖子管理'
+        verbose_name_plural = '4-0. 帖子管理'

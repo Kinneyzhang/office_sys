@@ -1,16 +1,25 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+
 import TheHome from '@/components/TheHome'
+
 import TheQuiz from '@/components/TheQuiz'
+import QuizList from '@/components/QuizList'
+import QuizType from '@/components/QuizType'
+import SinglePoint from '@/components/SinglePoint'
+import ManyPoint from '@/components/ManyPoint'
+
 import TheDiscuss from '@/components/TheDiscuss'
-import TheLearn from '@/components/TheLearn'
+import PostList from '@/components/PostList'
+import PostTag from '@/components/PostTag'
 import DiscussPost from '@/components/DiscussPost'
+
+import TheLearn from '@/components/TheLearn'
+
 import UserInfo from '@/components/UserInfo'
 import UserDownload from '@/components/UserDownload'
 import UserExercise from '@/components/UserExercise'
 import UserPost from '@/components/UserPost'
-import PostTag from '@/components/PostTag'
-import PostList from '@/components/PostList'
 
 Vue.use(Router)
 
@@ -23,20 +32,42 @@ export default new Router({
 	},
 	{
 	    path: '/quiz',
-	    name: 'TheQuiz',
-	    component: TheQuiz
+	    redirect: '/quiz/latest',
+	    component: TheQuiz,
+	    children: [
+		{
+		    path: 'latest',
+		    component: QuizList
+		},
+		{
+		    path: ':quizType',
+		    redirect: ':quizType/many',
+		    component: QuizType,
+		    children: [
+			{
+			    path: 'many',
+			    component: ManyPoint
+			},
+			{
+			    path: ':point',
+			    component: SinglePoint
+			}
+		    ]
+		}
+	    ]
 	},
 	{
 	    path: '/post',
-	    redirect: '/post/all',
+	    redirect: '/post/latest',
 	    component: TheDiscuss,
 	    children: [
 		{
-		    path: 'all',
+		    path: 'latest',
 		    component: PostList
 		},
 		{
 		    path: 'tag/:tagName',
+		    name: 'tagList',
 		    component: PostTag
 		},
 	    ]
@@ -53,6 +84,7 @@ export default new Router({
 	},
 	{
 	    path: '/user/:username',
+	    redirect: '/user/:username/download',
 	    component: UserInfo,
 	    children: [
 		{

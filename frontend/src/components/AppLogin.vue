@@ -15,7 +15,7 @@
         </template>
         <v-card>
           <v-toolbar class="elevation-1 white" dense>
-            <v-toolbar-title>
+            <v-toolbar-title class="font-weight-bold">
               登陆账号
             </v-toolbar-title>
           </v-toolbar>
@@ -45,8 +45,8 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <el-button type="primary" :plain="true" color="" @click="login_dialog = false">取消</el-button>
-            <el-button type="primary" :plain="true" @click="login">确定</el-button>
+            <v-btn color="primary" class="btn-style body-2" flat small @click="login_dialog = false">取消</v-btn>
+            <v-btn color="primary" class="btn-style body-2" flat small @click="login">确定</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -57,7 +57,7 @@
         </template>
         <v-card>
           <v-toolbar class="elevation-1 white" dense>
-            <v-toolbar-title>
+            <v-toolbar-title class="font-weight-bold">
               注册账号
             </v-toolbar-title>
           </v-toolbar>
@@ -96,10 +96,8 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <el-button type="primary" :plain="true" @click="register_dialog = false">取消</el-button>
-            <el-button type="primary" :plain="true" @click="register">确定</el-button>
-            <!-- <v-btn color="indigo" dark @click="register_dialog = false">取消</v-btn>
-                 <v-btn color="indigo" dark @click="register">确定</v-btn> -->
+            <v-btn color="primary" class="btn-style body-2" flat small @click="register_dialog = false">取消</v-btn>
+            <v-btn color="primary" class="btn-style body-2" flat small @click="register">确定</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -121,11 +119,18 @@
    }),
    methods: {
      register(){
-       this.$axios.post("api/register/", JSON.stringify(
-         {"new_username": this.username,
-          "new_password1": this.password1,
-          "new_password2": this.password2
-         })).then(res => {
+       if(!this.username || !this.password1 || !this.password2){
+         this.$message({
+           message: '输入不能为空！'
+         })
+       }else{
+         this.$axios.post("api/register/", JSON.stringify(
+           {
+             "new_username": this.username,
+             "new_password1": this.password1,
+             "new_password2": this.password2
+           }
+         )).then(res => {
            if(res.data.msg=='账号注册成功!'){
              this.register_dialog = false
              this.$message({
@@ -143,35 +148,42 @@
            this.reload()
          }).catch(err => {
            console.log(err)
-         })
+         }) 
+       }
      },
      login(){
-       this.$axios.post("api/login/", JSON.stringify(
-         {"username": this.username, "password": this.password}
-       )).then( res => {
-         if(res.data.is_login == false){
-           this.msg = "*" + res.data.msg;
-           this.username = "";
-           this.password = "";
-         }else{
-           this.login_dialog = false
-           sessionStorage.setItem("islogin", res.data.is_login)
-           sessionStorage.setItem("username", res.data.user_name)
-           sessionStorage.setItem("userid", res.data.user_id)
-           sessionStorage.setItem("registertime", res.data.register_time)
-           this.$store.commit({
-             type: 'login',
-             islogin: sessionStorage.getItem("islogin"),
-             username: sessionStorage.getItem("username"),
-             userid: sessionStorage.getItem("userid"),
-             registertime: sessionStorage.getItem("registertime")
-           })
-         }
-         console.log(res.data)
-         /* this.reload() */
-       }).catch( err => {
-         console.log(err)
-       })
+       if(!this.username || !this.password){
+         this.$message({
+           message: '输入不能为空！'
+         })
+       }else{
+         this.$axios.post("api/login/", JSON.stringify(
+           {"username": this.username, "password": this.password}
+         )).then( res => {
+           if(res.data.is_login == false){
+             this.msg = "*" + res.data.msg;
+             this.username = "";
+             this.password = "";
+           }else{
+             this.login_dialog = false
+             sessionStorage.setItem("islogin", res.data.is_login)
+             sessionStorage.setItem("username", res.data.user_name)
+             sessionStorage.setItem("userid", res.data.user_id)
+             sessionStorage.setItem("registertime", res.data.register_time)
+             this.$store.commit({
+               type: 'login',
+               islogin: sessionStorage.getItem("islogin"),
+               username: sessionStorage.getItem("username"),
+               userid: sessionStorage.getItem("userid"),
+               registertime: sessionStorage.getItem("registertime")
+             })
+           }
+           console.log(res.data)
+           /* this.reload() */
+         }).catch( err => {
+           console.log(err)
+         })
+       }
      },
      logout(){
        sessionStorage.clear()

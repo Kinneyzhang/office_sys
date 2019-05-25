@@ -28,7 +28,7 @@ class KnowledgePointAdmin(admin.ModelAdmin):
 
 class QuizBankAdmin(admin.ModelAdmin):
     list_display = (
-        'quizId', 'quizText', 'quizFullScore', 'quizInputer',
+        'quizId', 'quizText','quizType', 'quizFullScore', 'quizInputer',
         'quizCreateTime', 'quizModifyTime'
     )
     fields = (
@@ -64,7 +64,12 @@ class ExerRecordAdmin(admin.ModelAdmin):
         'correctStatus', 'correctTime', 'correctFlag',
         'quizScore', 'resultInfo',
     )
-
+    
+    list_filter = (
+        'user', 'quiz',
+    )
+    search_fields = ('user','quiz')
+    
 
 class PostAdmin(admin.ModelAdmin):
     list_display = (

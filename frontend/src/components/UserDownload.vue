@@ -24,6 +24,7 @@
 
 <script>
  export default{
+   inject: ['reload'],
    data(){
      return {
        download_list: [],

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-for="(item, i) in exer_list" class="downloadBox">
-      <div class="px-4 py-2">
+    <div v-for="(item, i) in exer_list" style="border-bottom: 0.1px solid #E0E0E0;">
+      <div class="px-4 py-3">
         <span class="font-weight-medium">{{item.quiz_id}}</span>
         <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.upload_time}}&nbsp;提交答案</span>
         <div v-if="!item.correct_status">
@@ -29,12 +29,10 @@
                 outline
                 rows=3>
               </v-textarea>
-              <div id="editor"></div>
               <v-btn small @click="correct_quiz(item.record_id)" class="font-weight-bold">批阅</v-btn>
               <v-btn small @click="cancle_sheet(i)" class="font-weight-bold">取消</v-btn>
             </v-list>
           </v-bottom-sheet>
-          
         </div>
         <div v-else>
           <span>得分：{{item.quiz_score}}</span><br>

@@ -68,6 +68,10 @@
    overflow:hidden;
  }
  .v-progress-circular{
-   margin: 1rem   
+   margin: 1rem
+ }
+ .btn-style{
+   border: 2px solid #E0E0E0;
+   font-weight: bold;
  }
 </style>

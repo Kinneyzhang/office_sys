@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.http import JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 # from django.core import serializers
-from .models import User, QuizBank, Post, PostTag, PostReply, ExerRecord
+from .models import User, QuizType, QuizBank, Post, PostTag, PostReply, ExerRecord, KnowledgePoint
 import json
 import datetime
 import os
@@ -46,9 +46,6 @@ def register(request):
     else:
         msg = "该用户已存在！"
 
-    # message = serializers.serialize('json', Queryset)
-    # safe=False, 序列化非字典对象时使用
-
     return JsonResponse({"msg": msg})
 
 
@@ -62,9 +59,6 @@ def login(request):
     registertime = ""
 
     request.session.flush()
-    # if request.session.get('is_login', True):
-    #     return JsonResponse({"msg": "you have already login!"})
-    # if request.method == 'POST':
 
     try:
         u = User.objects.get(userName=username)
@@ -95,24 +89,27 @@ def get_quiz(request):
     quiz = QuizBank.objects.all()
     quiz_list = []
     uploadNum = 0
-    accuracy = 1.0
-    temp = 0
     for q in quiz:
+        accuracy = 1.0
+        temp = 0
         # 获取试题的知识点
         # 计算平均正确率
-
         knowledgePoint = list(q.quizKnowledgePoint.all().values('knowledgePoint'))
         try:
             record = ExerRecord.objects.filter(quiz=q).filter(correctStatus=True)
             uploadNum = len(ExerRecord.objects.filter(quiz=q).filter(uploadStatus=True))
 
             for r in record:
-                temp += r.quizScore / q.quizFullScore
+                temp += (r.quizScore / q.quizFullScore)
+                print("平均数之和：%s" % temp)
             try:
-                accuracy = round(temp / len(record), 2)
+                accuracy = round(temp / len(record), 4)
+                print("正确率：%s" % accuracy)
+                print("记录条数：%s" % len(record))
             except ZeroDivisionError:
                 pass
         except ExerRecord.DoesNotExist:
+            accuracy = 1.0
             pass
 
         quiz_list.append({
@@ -123,6 +120,119 @@ def get_quiz(request):
             'accuracy': accuracy,
         })
     return JsonResponse(json.dumps(quiz_list), safe=False)
+
+
+def get_type_list(request):
+    type_list = []
+    typeSet = QuizType.objects.all()
+    for t in typeSet:
+        type_list.append(t.quizTypeName)
+    return JsonResponse(json.dumps(type_list), safe=False)
+
+
+# 获取综合知识点的试题
+def get_type_quiz(request):
+    req = json.loads(request.body.decode())
+    quiz_type = req["quiz_type"]
+    print(quiz_type)
+    quiz = None
+    try:
+        quiz = QuizBank.objects.filter(quizType=QuizType.objects.get(quizTypeName=quiz_type)).filter(quizPointNum='many')
+    except quiz.DoesNotExist:
+        return JsonResponse({"msg": "没有%s试题" % quiz_type})
+    else:
+        quiz_list = []
+        uploadNum = 0
+        for q in quiz:
+            accuracy = 1.0
+            temp = 0
+            # 获取试题的知识点
+            # 计算平均正确率
+            knowledgePoint = list(q.quizKnowledgePoint.all().values('knowledgePoint'))
+            try:
+                record = ExerRecord.objects.filter(quiz=q).filter(correctStatus=True)
+                uploadNum = len(ExerRecord.objects.filter(quiz=q).filter(uploadStatus=True))
+                
+                for r in record:
+                    temp += (r.quizScore / q.quizFullScore)
+                    print("平均数之和：%s" % temp)
+                    try:
+                        accuracy = round(temp / len(record), 4)
+                        print("正确率：%s" % accuracy)
+                        print("记录条数：%s" % len(record))
+                    except ZeroDivisionError:
+                        pass
+            except ExerRecord.DoesNotExist:
+                accuracy = 1.0
+                pass
+            
+            quiz_list.append({
+                'quizId': q.quizId,
+                'quizText': q.quizText,
+                'knowledgePoint': knowledgePoint,
+                'uploadNum': uploadNum,
+                'accuracy': accuracy,
+            })
+
+        return JsonResponse(json.dumps(quiz_list), safe=False)
+
+
+# 获取单一知识点的试题
+def get_point_quiz(request):
+    req = json.loads(request.body.decode())
+    quiz_type = req["quiz_type"]
+    knowledge_point = req["knowledge_point"]
+    quiz = None
+    try:
+        quiz = QuizBank.objects.filter(quizType=QuizType.objects.get(quizTypeName=quiz_type)).filter(quizPointNum='one').filter(quizKnowledgePoint__knowledgePoint=knowledge_point)
+    except QuizBank.DoesNotExist:
+        return JsonResponse({"msg": "没有%s试题" % quiz_type})
+    else:
+        quiz_list = []
+        uploadNum = 0
+        for q in quiz:
+            accuracy = 1.0
+            temp = 0
+            # 获取试题的知识点
+            # 计算平均正确率
+            knowledgePoint = list(q.quizKnowledgePoint.all().values('knowledgePoint'))
+            try:
+                record = ExerRecord.objects.filter(quiz=q).filter(correctStatus=True)
+                uploadNum = len(ExerRecord.objects.filter(quiz=q).filter(uploadStatus=True))
+                
+                for r in record:
+                    temp += (r.quizScore / q.quizFullScore)
+                    print("平均数之和：%s" % temp)
+                    try:
+                        accuracy = round(temp / len(record), 4)
+                        print("正确率：%s" % accuracy)
+                        print("记录条数：%s" % len(record))
+                    except ZeroDivisionError:
+                        pass
+            except ExerRecord.DoesNotExist:
+                accuracy = 1.0
+                pass
+            
+            quiz_list.append({
+                'quizId': q.quizId,
+                'quizText': q.quizText,
+                'knowledgePoint': knowledgePoint,
+                'uploadNum': uploadNum,
+                'accuracy': accuracy,
+            })
+
+        return JsonResponse(json.dumps(quiz_list), safe=False)
+
+
+def get_knowledge_point(request):
+    knowledge_list = []
+    req = json.loads(request.body.decode())
+    quizType = req["quiz_type"]
+    knowledgeSet =  KnowledgePoint.objects.filter(quizType=QuizType.objects.get(quizTypeName=quizType))
+    for k in knowledgeSet:
+        knowledge_list.append(k.knowledgePoint)
+        
+    return JsonResponse(json.dumps(knowledge_list), safe=False)
 
 
 # 上传下载 ##################################################################

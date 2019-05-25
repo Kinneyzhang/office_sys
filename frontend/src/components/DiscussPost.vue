@@ -26,7 +26,7 @@
                 </v-btn>
               </template>
               <v-list class="pa-2">
-                <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
+                <div class="font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
                 <v-textarea
                   v-model="reply_content"
                   label="回复楼主"
@@ -37,8 +37,8 @@
                   placeholder="输入回复的内容"
                   rows=6>
                 </v-textarea>
-                <v-btn small @click="create_post_reply" class="font-weight-bold">回复</v-btn>
-                <v-btn small @click="cancle_post_sheet" class="font-weight-bold">取消</v-btn>
+                <v-btn small color="primary" @click="create_post_reply" class="font-weight-bold">回复</v-btn>
+                <v-btn small color="primary" @click="cancle_post_sheet" class="font-weight-bold">取消</v-btn>
               </v-list>
             </v-bottom-sheet>
           </v-flex>
@@ -73,7 +73,7 @@
                 </v-btn>
               </template>
               <v-list class="pa-2">
-                <div><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
+                <div class="font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
                 <v-textarea
                   v-model="reply_content"
                   :label= "reply_other"
@@ -83,8 +83,8 @@
                   placeholder="输入回复的内容"
                   rows=6>
                 </v-textarea>
-                <v-btn small @click="create_reply_reply(item.reply_from, index)" class="font-weight-bold">回复</v-btn>
-                <v-btn small @click="cancle_reply_sheet(index)" class="font-weight-bold">取消</v-btn>
+                <v-btn small color="primary" @click="create_reply_reply(item.reply_from, index)" class="font-weight-bold">回复</v-btn>
+                <v-btn small color="primary" @click="cancle_reply_sheet(index)" class="font-weight-bold">取消</v-btn>
               </v-list>
             </v-bottom-sheet>
           </v-flex>
@@ -112,11 +112,6 @@
        postId: 0,
        postCreateTime: null,
        postViewNum: null,
-
-       /* rules: {
-        *   required: (value) => !!value || 'Required',
-        * }, */
-       
      }
    },
    methods: {
@@ -269,15 +264,6 @@
        }
      }
    },
-   /* watch: {
-    *   '$route.path': function(newVal, oldVal){
-    *     sessionStorage.removeItem("post_id")
-    *     sessionStorage.removeItem("post_person")
-    *     sessionStorage.removeItem("post_tag")
-    *     sessionStorage.removeItem("post_title")
-    *     sessionStorage.removeItem("post_content")
-    *   }
-    * }, */
    created(){
      this.get_reply()
    }
