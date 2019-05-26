@@ -1,43 +1,58 @@
 <template>
-  <v-card>
-    <!-- <v-img
-         src= "https://cn.bing.com/th?id=OHR.Paepalanthus_ZH-CN2626725103_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp"
-         aspect-ratio="2"
-         ></v-img> -->
-    <v-card-title primary-title>
-      <div>
-        <span class="title mt-0">{{ card_title }}</span>
+  <div>
+    <v-card>
+      <v-card-title primary-title>
+        <div>
+          <span class="title mt-0" v-if="!islogin">请登录</span>
+          <span class="title mt-0" v-else>欢迎，{{username}}！</span>
+        </div>
+      </v-card-title>
+    </v-card>
+    <v-card class="mt-4">
+      <div class="px-4 py-4">
+        <div class="mt-0">
+          <span class="subheading font-weight-bold">已下载试题</span><br>
+          <user-download></user-download>
+        </div>
+        <v-divider></v-divider>
+        <div>
+          <span class="subheading font-weight-bold">查看批阅结果</span>
+          <user-exercise></user-exercise>
+        </div>
+        <v-divider></v-divider>
+        <div>
+          <span class="subheading font-weight-bold">推荐您下载</span>
+        </div>
       </div>
-    </v-card-title>
-    <v-card-actions>
-    </v-card-actions>
-  </v-card>
+    </v-card>
+  </div>
 </template>
 
 <script>
+ import UserDownload from '@/components/UserDownload'
+ import UserExercise from '@/components/UserExercise'
  export default {
+   inject: ['reload'],
+   components: {
+     UserDownload,
+     UserExercise,
+   },
    data () {
      return {
-       card_title: '欢迎，Kinney',
+       
      }
+   },
+   computed: {
+     username(){
+       return this.$store.state.username
+     },
+     islogin(){
+       return this.$store.state.islogin
+     },
    },
    methods: {
-     getBingImage(){
-       var instance = this.$axios.create({
-         baseUrl: '',
-         headers: {
-           'Access-Control-Allow-Origin': '*'
-         }
-       })
-       instance.get('https://cn.bing.com/').then(res => {
-         console.log(res.data)
-       }).catch(err => {
-         console.log(err)
-       })
-     }
    },
    created(){
-     /* this.getBingImage() */
    }
  }
 </script>

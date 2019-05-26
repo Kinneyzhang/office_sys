@@ -1,9 +1,8 @@
-
 <template>
-  <!-- <post-list :data="postList"></post-list> -->
   <el-table
     :data="postList"
-    style="width: 100%">
+    style="width: 100%"
+  >
     <el-table-column
       label="主题"
       min-width="70%">
@@ -12,7 +11,7 @@
           <router-link
             tag="span"
             :to="link(scope.row.id)"
-            class="pointer subheading font-weight-bold"
+            class="pointer subheading font-weight-medium"
           >
             <v-icon outline>label_important</v-icon>
             {{scope.row.title}}

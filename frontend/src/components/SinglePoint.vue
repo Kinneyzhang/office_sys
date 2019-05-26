@@ -2,6 +2,8 @@
   <el-table
     :data="quizlist"
     style="width:100%"
+    stripe
+    fit
   >
     <el-table-column
       label="编号"

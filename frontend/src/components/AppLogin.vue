@@ -179,7 +179,7 @@
              })
            }
            console.log(res.data)
-           /* this.reload() */
+           this.reload()
          }).catch( err => {
            console.log(err)
          })

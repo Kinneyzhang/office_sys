@@ -15,7 +15,7 @@
         <v-flex xs1 sm3 md1>
           <v-menu offset-y z-index="1">
             <template v-slot:activator="{ on }">
-              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">主题分类<v-icon small>arrow_drop_down</v-icon></v-btn>
+              <v-btn small flat color="primary" v-on="on" class="btn-style subheading">主题分类<v-icon>arrow_drop_down</v-icon></v-btn>
             </template>
             <v-list dense>
               <v-list-tile
@@ -29,13 +29,13 @@
           </v-menu>
         </v-flex>
         <v-flex sm3 md1 offset-sm1>
-          <v-btn flat small color="primary" class="btn-style body-2" @click="latestPost">最近活动</v-btn>
+          <v-btn flat small color="primary" class="btn-style subheading" @click="latestPost">最近活动</v-btn>
         </v-flex>
         <v-flex xs1 sm3 md1 offset-sm1>
           <div class="text-xs-center">
             <v-bottom-sheet v-model="sheet" inset>
               <template v-slot:activator>
-                <v-btn small flat color="purple" class="btn-style body-2"><v-icon>add</v-icon>创建主题</v-btn>
+                <v-btn small flat color="purple" class="btn-style subheading"><v-icon>add</v-icon>创建主题</v-btn>
               </template>
               <v-list class="px-3">
                 <div class="mt-2 font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;创建新的主题</div><br>

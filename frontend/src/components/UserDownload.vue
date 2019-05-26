@@ -1,24 +1,36 @@
 <template>
   <div>
     <input type="file" class="uploadHide" ref="file" multiple accept=".zip, .rar" @change="getFile($event)">
-    <div v-for="(item, i) in download_list" class="downloadBox">
-      <!-- <v-layout row justify-center align-center>
-           <v-flex md10 sm10> -->
-      <div class="px-4 py-2">
-        <span class="font-weight-medium">{{item.quiz_id}}</span>
-        <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.download_time}}&nbsp;下载</span>
-        
-        <div class="pt-4"><p class="" v-html="item.quiz_text"></p></div>
-        
-        <form v-if="!item.upload_status">
-          <v-btn small flat class="grey--text" @click="popWindow"><u>选择答案文件</u></v-btn>
-          <v-btn small color="info" flat @click="upload($event,item.record_id)">
-            <v-icon color="info">publish</v-icon>上传
-          </v-btn>
-        </form>
-        <v-btn v-else small flat class="grey--text">答案已提交</v-btn>
-      </div>
-    </div>
+    <v-expansion-panel
+      class="elevation-0"
+    >
+      <v-expansion-panel-content
+        v-for="(item, index) in download_list"
+        :key="index"
+      >
+        <template v-slot:actions>
+          <v-icon small color="warning" v-if="!item.upload_status">info</v-icon>
+          <v-icon small color="primary" v-else>check_circle</v-icon>
+        </template>
+        <template v-slot:header>
+          <div>
+            <span class="font-weight-medium">{{item.quiz_id}}</span>
+            <span class="caption grey--text font-weight-medium">&nbsp;&nbsp;{{item.download_time}}&nbsp;下载</span>
+            <form v-if="!item.upload_status" class="d-inline">
+              <v-btn small flat class="font-italic" @click.stop="popWindow"><u>选择答案文件</u></v-btn>
+              <v-btn small color="primary" flat @click.stop="upload($event,item.record_id)">
+                <v-icon color="primary">publish</v-icon>
+                <span class="font-weight-black body-2">上传</span>
+              </v-btn>
+            </form>
+            <v-btn v-else small flat class="grey--text text--darken-3">答案已提交</v-btn>
+          </div>
+        </template>
+        <div class="px-4">
+          <p class="" v-html="item.quiz_text"></p>
+        </div>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
   </div>
 </template>
 

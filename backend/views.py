@@ -264,18 +264,19 @@ def upload(request):
     upload_dir = os.path.join(BASE_DIR, 'upload', 'user_upload', 'user_%s' % user_id)
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
-        upload_path = os.path.join(upload_dir, fileObj.name)
-        # try:
-        #     with open(upload_path, mode='rb') as f:
-        #         pass
-        # except FileNotFoundError:
-        #     with open(upload_path, mode='wb') as f:
-        #         print("文件创建成功！")
+    upload_path = os.path.join(upload_dir, fileObj.name)
 
     f = open(upload_path, 'wb')
     for chunk in fileObj.chunks():
         f.write(chunk)
         f.close()
+    
+    # try:
+    #     with open(upload_path, mode='rb') as f:
+    #         pass
+    # except FileNotFoundError:
+    #     with open(upload_path, mode='wb') as f:
+    #         print("文件创建成功！")
 
     # The reason for this error is that .get() returns an individual object and.update() only works on querysets, such as what would be returned with .filter() instead of .get().
     ExerRecord.objects.filter(pk=record_id).update(uploadStatus=True, uploadTime=datetime.datetime.now(), uploadFilename=fileObj.name)
@@ -330,6 +331,7 @@ def get_post_list(request):
             'post_id': p.id,
             'poster': p.postPerson.userName,
             'post_title': p.postTitle,
+            'post_content': p.postContent,
             'post_tag': p.postTag.postTag,
             'post_create_time': p.postCreateTime,
             'post_modify_time': p.postModifyTime,
@@ -441,8 +443,21 @@ def create_reply_reply(request):
     return JsonResponse({"msg": "回复成功！"})
 
 
-# 个人记录 #################################################################
+# 帖子收藏 #########################################################
+def collect_post(request):
+    req = json.loads(request.body.decode())
+    postId = req["post_id"]
+    userId = req["user_id"]
+    if Post.objects.get(pk=postId).postCollect.all().filter(id__contains=userId):
+        Post.objects.get(pk=postId).postCollect.remove(User.objects.get(pk=userId))
+        return JsonResponse({"msg": "帖子取消收藏成功！"})
+    else:
+        Post.objects.get(pk=postId).postCollect.add(User.objects.get(pk=userId))
+        return JsonResponse({"msg": "帖子收藏成功！"})
 
+
+
+# 个人记录 #################################################################
 def get_quiz_record(request):
     req = json.loads(request.body.decode())
     recordList = []
@@ -494,6 +509,31 @@ def get_post_record(request):
 
     return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
 
+
+def get_collect_record(request):
+    recordList = []
+    req = json.loads(request.body.decode())
+    # 当用户退出登录时，会产生异常
+    try:
+        userId = req["user_id"]
+    except BaseException:
+        return JsonResponse(json.dumps(recordList), safe=False)
+    recordSet = User.objects.get(pk=userId).collect.all()
+    # 用related_name代替post_set
+    for r in recordSet:
+        recordList.append({
+            'post_id': r.id,
+            'poster': r.postPerson.userName,
+            'post_title': r.postTitle,
+            'post_tag': r.postTag.postTag,
+            'post_create_time': r.postCreateTime,
+            'post_modify_time': r.postModifyTime,
+            'reply_num': len(r.postReply.all()),
+            'view_num': r.postViewNum,
+        })
+
+    return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
+    
 
 # 模拟批阅 #################################################################
 

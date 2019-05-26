@@ -20,6 +20,9 @@
         <router-link :to="post_link" tag="span">
           <v-btn small flat color="primary" class="font-weight-bold subheading">发帖记录</v-btn>
         </router-link>
+        <router-link :to="collect_link" tag="span">
+          <v-btn small flat color="primary" class="font-weight-bold subheading">帖子收藏</v-btn>
+        </router-link>
       </div>
       
       <router-view></router-view>
@@ -51,6 +54,9 @@
      post_link (){
        return "/user/" + this.userName + "/post"
      },
+     collect_link (){
+       return "/user/" + this.userName + "/collect"
+     }
    },
  }
 </script>

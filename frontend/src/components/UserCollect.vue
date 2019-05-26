@@ -1,44 +1,31 @@
 <template>
-  <el-table
-    :data="postList"
-    style="width: 100%"
-    fix
-  >
-    <el-table-column
-      label="主题"
-      min-width="70%">
-      <template slot-scope="scope">
-        <div v-if="scope.row.sticky">
+  <div class="px-4 py-2">
+    <el-table
+      :data="postList"
+      style="width: 100%">
+      <el-table-column
+        label="主题"
+        min-width="70%">
+        <template slot-scope="scope">
           <router-link
             tag="span"
-            :to="link(scope.row.id)"
-            class="pointer subheading font-weight-medium"
-          >
-            <v-icon small outline>label_important</v-icon>
-            {{scope.row.title}}
-          </router-link><br>
-          <p class="mt-2">{{scope.row.content}}</p>
-        </div>
-        <div v-else>
-          <router-link
-            tag="span"
-            :to="link(scope.row.id)"
+            :to="post_link(scope.row.id)"
             class="pointer subheading font-weight-medium"
             v-html="scope.row.title"
           ></router-link>
           <br>
           <router-link
-            :to="tagLink(scope.row.tag)"
+            to = "/discuss"
             tag="span"
-            class="font-weight-bold pointer"
-            style="font-size:12px;"
+            class="font-weight-bold pointer grey--text grey lighten-3"
+            style="font-size:13px;"
           >{{scope.row.tag}}</router-link>
           <span v-html="scope.row.divider" class="grey--text caption"></span>
           <router-link
             to = "/discuss"
             tag="span"
             class="font-weight-bold pointer"
-            style="font-size:12px;"
+            style="font-size:13px;"
           >{{scope.row.poster}}</router-link>
           <span v-html="scope.row.divider" class="grey--text caption"></span>
           <router-link
@@ -47,52 +34,48 @@
             class="font-weight-bold grey--text"
             style="font-size:10px;"
           >创建于&nbsp;{{timeFormat(scope.row.create)}}</router-link>
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="reply"
-      label="回复"
-      align="center"
-      min-width="10%">
-    </el-table-column>
-    <el-table-column
-      prop="view"
-      label="浏览"
-      align="center"
-      min-width="10%">
-    </el-table-column>
-    <el-table-column
-      label="活动"
-      align="center"
-      min-width="10%">
-      <template slot-scope="scope">
-        <span>{{timeFormat(scope.row.active)}}</span>
-      </template>
-    </el-table-column>
-  </el-table>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="reply"
+        label="回复"
+        align="center"
+        min-width="10%">
+      </el-table-column>
+      <el-table-column
+        prop="view"
+        label="浏览"
+        align="center"
+        min-width="10%">
+      </el-table-column>
+      <el-table-column
+        label="活动"
+        align="center"
+        min-width="10%">
+        <template slot-scope="scope">
+          <span>{{timeFormat(scope.row.active)}}</span>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script>
  export default {
-   data(){
+   data() {
      return {
-       postList: []
+       active: null,
+       postList: [],
      }
    },
    computed: {
-     link(){
+     post_link(){
        return function(post_id){
          return "/post/" + post_id
        }
      },
-     tagLink(){
-       return function(post_tag){
-         return "/post/tag/" + post_tag
-       }
-     },
      timeFormat(){
-       return (time) => {
+       return function(time){
          //如果时间格式是正确的，那下面这一步转化时间格式就可以不用了
          var dateBegin = new Date(time.replace(/-/g, "/"));//将-转化为/，使用new Date
          var dateEnd = new Date();//获取当前时间
@@ -117,13 +100,15 @@
          else
            timeString += "刚刚"
 
-         return timeString 
+         return timeString
        }
      },
    },
    methods: {
-     get_all_post(){
-       this.$axios.get("api/get_post_list/").then(res => {
+     get_collect_record(){
+       this.$axios.post("api/get_collect_record/", JSON.stringify({
+         "user_id": this.$store.state.userid,
+       })).then(res => {
          console.log(res.data)
          res = JSON.parse(res.data)
          
@@ -136,21 +121,18 @@
          var viewNum = res.map(v => v.view_num)
          var modifyTime = res.map(v => v.post_modify_time)
          var createTime = res.map(v => v.post_create_time)
-         var stickyPost = res.map(v => v.sticky_post)
          
          for(var i=0; i<postPerson.length; i++){
            this.postList.unshift({
              id: postId[i],
              poster: postPerson[i],
              title: postTitle[i],
-             content: postContent[i],
              tag: postTag[i],
              reply: replyNum[i],
              view: viewNum[i],
              active: modifyTime[i],
              create: createTime[i],
-             divider: "&nbsp;●&nbsp;",
-             sticky: stickyPost[i]
+             divider: "&nbsp;●&nbsp;"
            })
          }
        }).catch(err => {
@@ -159,7 +141,7 @@
      },
    },
    created(){
-     this.get_all_post()
+     this.get_collect_record()
    }
  }
 </script>

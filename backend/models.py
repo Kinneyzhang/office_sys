@@ -207,6 +207,11 @@ class Post(models.Model):
         verbose_name="回复帖子",
         related_name="reply"
     )
+    postCollect = models.ManyToManyField(
+        User,
+        verbose_name="收藏帖子",
+        related_name="collect"
+    )
     postCreateTime = models.DateTimeField(auto_now_add=True, verbose_name="发帖时间")
     postModifyTime = models.DateTimeField(default=timezone.now, verbose_name="修改时间")
     postViewNum = models.IntegerField(default=0, verbose_name="浏览量")

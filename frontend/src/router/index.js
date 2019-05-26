@@ -20,6 +20,7 @@ import UserInfo from '@/components/UserInfo'
 import UserDownload from '@/components/UserDownload'
 import UserExercise from '@/components/UserExercise'
 import UserPost from '@/components/UserPost'
+import UserCollect from '@/components/UserCollect'
 
 Vue.use(Router)
 
@@ -98,6 +99,10 @@ export default new Router({
 		{
 		    path: 'post',
 		    component: UserPost
+		},
+		{
+		    path: 'collect',
+		    component: UserCollect
 		}
 	    ]
 	},

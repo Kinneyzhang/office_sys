@@ -5,7 +5,7 @@
         <v-flex sm3 md1>
           <v-menu offset-y z-index="1">
             <template v-slot:activator="{ on }">
-              <v-btn small flat color="primary" v-on="on" class="btn-style body-2">试题分类<v-icon small>arrow_drop_down</v-icon></v-btn>
+              <v-btn small flat color="primary" v-on="on" class="btn-style subheading">试题分类<v-icon>arrow_drop_down</v-icon></v-btn>
             </template>
             <v-list dense>
               <v-list-tile
@@ -20,7 +20,7 @@
         </v-flex>
         <v-flex sm3 md1 offset-md1 offset-sm1>
           <div>
-            <v-btn small flat color="primary" class="btn-style body-2" @click="latestQuiz">最新发布</v-btn>
+            <v-btn small flat color="primary" class="btn-style subheading" @click="latestQuiz">最新发布</v-btn>
           </div>
         </v-flex>
       </v-layout>

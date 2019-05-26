@@ -2,94 +2,102 @@
   <!-- 帖子标题内容板块 -->
   <div>
     <v-card class="elevation-1">
-      <p class="overflow headline font-weight-bold px-3 pt-4">{{postTitle}}</p>
-      <div class="grey--text text--darken-2">
-        <span class="font-weight-medium ml-3">{{postTag}} ●</span>
-        <span class="font-weight-medium">{{postPerson}} ●</span>
-        <span class="font-weight-medium">发布时间: {{postCreateTime}}</span>
-      </div>
-      <v-divider></v-divider>
-      <div class="pl-3 pr-3">
-        <v-layout row justify-center>
-          <v-flex md12 sm12>
-            <p class="overflow pl-3 pr-2">{{postContent}}</p>
-          </v-flex>
-        </v-layout>
-        <v-layout row justify-center>
-          <v-flex md3 sm3>
-            <v-bottom-sheet
-              v-model="post_sheet"
-              inset>
-              <template v-slot:activator>
-                <v-btn flat small class="grey--text">
-                  <v-icon small>reply</v-icon>回复
-                </v-btn>
-              </template>
-              <v-list class="pa-2">
-                <div class="font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
-                <v-textarea
-                  v-model="reply_content"
-                  label="回复楼主"
-                  auto-grow
-                  required
-                  flat
-                  outline
-                  placeholder="输入回复的内容"
-                  rows=6>
-                </v-textarea>
-                <v-btn small flat color="primary" @click="create_post_reply" class="body-2 btn-style">回复</v-btn>
-                <v-btn small flat color="primary" @click="cancle_post_sheet" class="body-2 btn-style">取消</v-btn>
-              </v-list>
-            </v-bottom-sheet>
-          </v-flex>
-          <v-flex md3 sm3>
-            <v-btn flat small class="grey--text">
-              <v-icon small>favorite</v-icon>收藏
-            </v-btn>
-          </v-flex>
-        </v-layout>
+      <div class="px-4 py-4">
+        <p class="overflow headline font-weight-bold">{{postTitle}}</p>
+        <!-- px-3 pt-4 -->
+        <div class="grey--text text--darken-2">
+          <span class="font-weight-medium">{{postTag}} ●</span>
+          <span class="font-weight-medium">{{postPerson}} ●</span>
+          <span class="font-weight-medium">发布时间: {{postCreateTime}}</span>
+        </div>
+        <v-divider></v-divider>
+        <div class="pl-3 pr-3">
+          <v-layout row justify-center>
+            <v-flex md12 sm12>
+              <p class="overflow subheading">{{postContent}}</p> <!-- pl-3 pr-2 -->
+            </v-flex>
+          </v-layout>
+          <v-layout row justify-center>
+            <v-flex md3 sm3>
+              <v-bottom-sheet
+                v-model="post_sheet"
+                inset>
+                <template v-slot:activator>
+                  <v-btn flat small class="body-2 font-weight-bold" color="primary">
+                    <v-icon small>reply</v-icon>回复
+                  </v-btn>
+                </template>
+                <v-list class="pa-2">
+                  <div class="font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
+                  <v-textarea
+                    v-model="reply_content"
+                    label="回复楼主"
+                    auto-grow
+                    required
+                    flat
+                    outline
+                    placeholder="输入回复的内容"
+                    rows=6>
+                  </v-textarea>
+                  <v-btn small flat color="primary" @click="create_post_reply" class="body-2 btn-style">回复</v-btn>
+                  <v-btn small flat color="primary" @click="cancle_post_sheet" class="body-2 btn-style">取消</v-btn>
+                </v-list>
+              </v-bottom-sheet>
+            </v-flex>
+            <v-flex md3 sm3>
+              <v-btn flat small @click="collect_post" color="purple" v-if="true" class="body-2 font-weight-bold">
+                <v-icon small>favorite</v-icon>加入收藏
+              </v-btn>
+              <v-btn flat small @click="collect_post" v-else>
+                <v-icon small class="black--text">favorite</v-icon>取消收藏
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </div>
       </div>
     </v-card>
     <!-- 回复板块 -->
     <v-card class="mt-4">
-      <div v-for="(item, index) in replyList" class="reply_box">
-        <v-layout row justify-center align-center>
-          <v-flex md10 sm10>
-            <div class="pl-5 pt-3">
-              <span class="grey--text text--darken-1 font-weight-medium">{{item.reply_from}}</span>
-              <span class="caption grey--text text--darken-1 font-weight-medium">&nbsp;&nbsp;{{timeFormat(item.reply_time)}}</span>
-              <p class="overflow mt-2">
-                <span v-show="isShow(item.reply_to)" class="grey--text">@{{item.reply_to}}&nbsp;&nbsp;</span>
-                {{item.reply_content}}
-              </p>
-            </div>
-          </v-flex>
-          <!-- 弹出输入框 -->
-          <v-flex md2 sm2>
-            <v-bottom-sheet v-model="item.reply_sheet" inset>
-              <template v-slot:activator>
-                <v-btn flat small class="grey--text" @click="reply_reply(item.reply_from)">
-                  <v-icon small>{{item.reply_icon}}</v-icon>回复
-                </v-btn>
-              </template>
-              <v-list class="pa-2">
-                <div class="font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
-                <v-textarea
-                  v-model="reply_content"
-                  :label= "reply_other"
-                  auto-grow
-                  flat
-                  outline
-                  placeholder="输入回复的内容"
-                  rows=6>
-                </v-textarea>
-                <v-btn small flat color="primary" @click="create_reply_reply(item.reply_from, index)" class="body-2 btn-style">回复</v-btn>
-                <v-btn small flat color="primary" @click="cancle_reply_sheet(index)" class="body-2 btn-style">取消</v-btn>
-              </v-list>
-            </v-bottom-sheet>
-          </v-flex>
-        </v-layout>
-        <!-- <v-divider v-if="index + 1 < replyList.length" :key="`divider-${index}`"></v-divider> -->
+      <div>
+        <div v-for="(item, index) in replyList" :key="index" class="reply_box">
+          <v-layout row justify-center align-center>
+            <v-flex md10 sm10>
+              <div class="pl-5 pt-3">
+                <span class="grey--text text--darken-1 font-weight-medium">{{item.reply_from}}</span>
+                <span class="caption grey--text text--darken-1 font-weight-medium">&nbsp;&nbsp;{{timeFormat(item.reply_time)}}</span>
+                <p class="overflow mt-2 subheading">
+                  <span v-show="isShow(item.reply_to)" class="grey--text">@{{item.reply_to}}&nbsp;&nbsp;</span>
+                  {{item.reply_content}}
+                </p>
+              </div>
+            </v-flex>
+            <!-- 弹出输入框 -->
+            <v-flex md2 sm2>
+              <v-bottom-sheet v-model="item.reply_sheet" inset>
+                <template v-slot:activator>
+                  <v-btn flat small @click="reply_reply(item.reply_from)" color="primary" class="body-2 font-weight-bold">
+                    <v-icon small>{{item.reply_icon}}</v-icon>回复
+                  </v-btn>
+                </template>
+                <v-list class="pa-2">
+                  <div class="font-weight-bold body-2"><v-icon>reply</v-icon>&nbsp;&nbsp;添加一条新回复</div><br>
+                  <v-textarea
+                    v-model="reply_content"
+                    :label= "reply_other"
+                    auto-grow
+                    flat
+                    outline
+                    placeholder="输入回复的内容"
+                    rows=6>
+                  </v-textarea>
+                  <v-btn small flat color="primary" @click="create_reply_reply(item.reply_from, index)" class="body-2 btn-style">回复</v-btn>
+                  <v-btn small flat color="primary" @click="cancle_reply_sheet(index)" class="body-2 btn-style">取消</v-btn>
+                </v-list>
+              </v-bottom-sheet>
+            </v-flex>
+          </v-layout>
+          <!-- <v-divider v-if="index + 1 < replyList.length" :key="`divider-${index}`"></v-divider> -->
+        </div>
       </div>
     </v-card>
   </div>
@@ -115,13 +123,25 @@
      }
    },
    methods: {
+     collect_post(){
+       this.$axios.post("api/collect_post/", JSON.stringify({
+         "post_id": sessionStorage.getItem("post_id"),
+         "user_id": this.$store.state.userid,
+       })).then(res => {
+         console.log(res.data)
+         this.$message({
+           message: res.data.msg
+         })
+       }).catch(err => {
+         console.log(err.data)
+       })
+     },
      get_reply(){
        this.$axios.post("api/get_reply/", JSON.stringify(
          {"post_id": this.$route.params.id}
        )).then(res => {
          console.log(res.data)
-         res = JSON.parse(res.data)
-         var last = res.length
+         var res = JSON.parse(res.data)
          
          this.postTitle = res[0].post_title
          this.postTag = res[0].post_tag
@@ -136,10 +156,10 @@
          sessionStorage.setItem("post_title", this.postTitle)
          sessionStorage.setItem("post_content", this.postContent)
          
-         var replyFrom = res.slice(1,last).map(v => v.reply_from)
-         var replyTo = res.slice(1,last).map(v => v.reply_to)
-         var replyContent = res.slice(1,last).map(v => v.reply_content)
-         var replyTime = res.slice(1,last).map(v => v.reply_time)
+         var replyFrom = res.slice(1).map(v => v.reply_from)
+         var replyTo = res.slice(1).map(v => v.reply_to)
+         var replyContent = res.slice(1).map(v => v.reply_content)
+         var replyTime = res.slice(1).map(v => v.reply_time)
          var sheet = []
          for(var i=0; i<replyFrom.length; i++){
            sheet[i] = false
@@ -279,6 +299,6 @@
    word-break:break-all;
  }
  .reply_box{
-   border-top: 0.1px solid #E0E0E0;
+   border-bottom: 0.1px solid #E0E0E0;
  }
 </style>

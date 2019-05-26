@@ -2,6 +2,8 @@
   <el-table
     :data="quizlist"
     style="width:100%"
+    stripe
+    fit
   >
     <el-table-column
       label="编号"
@@ -23,7 +25,7 @@
       <template slot-scope="scope">
         <v-menu bottom offset-y z-index="10">
           <template v-slot:activator="{ on }">
-            <v-btn small flat v-on="on" color="primary">点击预览</v-btn>
+            <v-btn small class="font-weight-bold body-2" flat v-on="on" color="primary">点击预览</v-btn>
           </template>
           <div class="quiz_text pa-3" v-html="scope.row.quiz_text"></div>
         </v-menu>
