@@ -533,7 +533,7 @@ def get_collect_record(request):
         })
 
     return JsonResponse(json.dumps(recordList, cls=ComplexEncoder), safe=False)
-    
+
 
 # 模拟批阅 #################################################################
 
@@ -543,6 +543,9 @@ def correct_quiz(request):
     quiz_score = req["quiz_score"]
     correct_info = req["correct_info"]
 
-    ExerRecord.objects.filter(pk=record_id).update(quizScore=quiz_score, resultInfo=correct_info, correctTime=datetime.datetime.now(), correctStatus=True)
+    ExerRecord.objects.filter(pk=record_id).update(
+        quizScore=quiz_score, resultInfo=correct_info,
+        correctTime=datetime.datetime.now(), correctStatus=True
+    )
 
     return JsonResponse({"msg": "批阅成功！"})

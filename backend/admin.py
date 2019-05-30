@@ -28,7 +28,7 @@ class KnowledgePointAdmin(admin.ModelAdmin):
 
 class QuizBankAdmin(admin.ModelAdmin):
     list_display = (
-        'quizId', 'quizText','quizType', 'quizFullScore', 'quizInputer',
+        'quizId', 'quizPointNum','quizText','quizType', 'quizFullScore', 'quizInputer',
         'quizCreateTime', 'quizModifyTime'
     )
     fields = (
@@ -38,9 +38,10 @@ class QuizBankAdmin(admin.ModelAdmin):
         'quizKnowledgePoint', 'quizFilename',
     )
     list_filter = (
-        'quizType', 'quizInputer',
+        'quizType', 'quizPointNum','quizInputer',
         'quizCreateTime', 'quizModifyTime'
     )
+    list_per_page = 4
 
     def save_model(self, request, obj, form, change):
         quizid = ""

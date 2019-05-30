@@ -2,9 +2,10 @@
   <div>
     <v-expansion-panel
       class="elevation-0"
+      expand
     >
       <v-expansion-panel-content
-        v-for="(item, index) in exer_list"
+        v-for="(item, index) in count_list"
         :key="index"
       >
         <template v-slot:actions>
@@ -55,6 +56,14 @@
         </div>
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <div class="text-xs-center">
+      <v-pagination
+        v-model="page"
+        :length="count_length"
+        prev-icon="mdi-menu-left"
+        next-icon="mdi-menu-right"
+      ></v-pagination>
+    </div>
   </div>
 </template>
 
@@ -66,6 +75,15 @@
        quiz_score: null,
        correct_info: "",
        exer_list: [],
+       page: 1,
+     }
+   },
+   computed: {
+     count_list(){
+       return this.exer_list.slice(eval(this.page*6-6),this.page*6)
+     },
+     count_length(){
+       return Number(this.exer_list.length/6+1)
      }
    },
    methods: {

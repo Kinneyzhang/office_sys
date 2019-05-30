@@ -15,6 +15,9 @@ import PostTag from '@/components/PostTag'
 import DiscussPost from '@/components/DiscussPost'
 
 import TheLearn from '@/components/TheLearn'
+import LearnList from '@/components/LearnList'
+import OverallVideo from '@/components/OverallVideo'
+import PointVideo from '@/components/PointVideo'
 
 import UserInfo from '@/components/UserInfo'
 import UserDownload from '@/components/UserDownload'
@@ -80,8 +83,28 @@ export default new Router({
 	},
 	{
 	    path: '/learn',
-	    name: 'TheLearn',
-	    component: TheLearn
+	    component: TheLearn,
+	    children: [
+		{
+		    path: 'latest',
+		    component: LearnList
+		},
+		{
+		    path: ':quizType',
+		    redirect: ':quizType/many',
+		    component: QuizType,
+		    children: [
+			{
+			    path: 'overall',
+			    component: OverallVideo
+			},
+			{
+			    path: ':point',
+			    component: PointVideo
+			}
+		    ]
+		}
+	    ]
 	},
 	{
 	    path: '/user/:username',

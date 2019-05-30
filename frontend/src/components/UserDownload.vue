@@ -3,9 +3,10 @@
     <input type="file" class="uploadHide" ref="file" multiple accept=".zip, .rar" @change="getFile($event)">
     <v-expansion-panel
       class="elevation-0"
+      expand
     >
       <v-expansion-panel-content
-        v-for="(item, index) in download_list"
+        v-for="(item, index) in count_list"
         :key="index"
       >
         <template v-slot:actions>
@@ -31,6 +32,14 @@
         </div>
       </v-expansion-panel-content>
     </v-expansion-panel>
+    <div class="text-xs-center">
+      <v-pagination
+        v-model="page"
+        :length="count_length"
+        prev-icon="mdi-menu-left"
+        next-icon="mdi-menu-right"
+      ></v-pagination>
+    </div>
   </div>
 </template>
 
@@ -41,6 +50,15 @@
      return {
        download_list: [],
        file: "",
+       page: 1,
+     }
+   },
+   computed: {
+     count_list(){
+       return this.download_list.slice(eval(this.page*6-6),this.page*6)
+     },
+     count_length(){
+       return eval(this.download_list.length/6+1)
      }
    },
    methods: {

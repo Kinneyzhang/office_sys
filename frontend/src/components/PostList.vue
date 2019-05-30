@@ -12,9 +12,9 @@
           <router-link
             tag="span"
             :to="link(scope.row.id)"
-            class="pointer subheading font-weight-medium"
+            class="pointer subheading font-weight-bold"
           >
-            <v-icon small outline>label_important</v-icon>
+            <v-icon small color="primary" outline>label_important</v-icon>
             {{scope.row.title}}
           </router-link><br>
           <p class="mt-2">{{scope.row.content}}</p>
